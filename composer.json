@@ -1,0 +1,21 @@
+{
+    "name": "door/core",
+    "license": "MIT",
+    "type": "library",
+    "description": "The core of Door framework",
+    "keywords": ["framerork","mvc"],
+    "authors": [
+    {
+        "name": "Sachik Sergey",
+        "homepage": "http://serginho.ru/"
+    }
+    ],
+    "require": {
+        "php" : ">5.4"
+    },
+    "autoload": {
+        "psr-0" : {
+            "Door\\Core" : "classes"
+        }
+    }
+}
