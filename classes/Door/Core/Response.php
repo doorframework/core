@@ -187,7 +187,7 @@ class Response {
 		{
 			return $this->_status;
 		}
-		elseif (array_key_exists($status, Response::$messages))
+		elseif (array_key_exists($status, $this->messages))
 		{
 			$this->_status = (int) $status;
 			return $this;
@@ -528,7 +528,7 @@ class Response {
 			}
 		}
 
-		$output = $this->_protocol.' '.$this->_status.' '.Response::$messages[$this->_status]."\r\n";
+		$output = $this->_protocol.' '.$this->_status.' '.$this->messages[$this->_status]."\r\n";
 		$output .= (string) $this->_header;
 		$output .= $this->_body;
 

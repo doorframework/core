@@ -144,6 +144,11 @@ class Door {
 		return $this->charset;
 	}
 	
+	public function request($uri)
+	{
+		return new Request($uri, $this);
+	}
+	
 	
 	
 

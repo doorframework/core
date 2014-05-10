@@ -67,6 +67,17 @@ class Request {
 	
 	public function execute()
 	{
+		$controller = $this->app->router->get_controller($this);
+		
+		if($controller != null)
+		{
+			$controller->execute();
+		}
+		else
+		{			
+			$this->response->status(404);
+			$this->response->body("resource not found");
+		}
 		
 		return $this;
 	}
