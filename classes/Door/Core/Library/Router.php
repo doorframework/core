@@ -14,7 +14,7 @@ use \Door\Core\Request;
  *
  * @author serginho
  */
-class Router extends Door\Core\Library {
+class Router extends \Door\Core\Library {
 	
 	/**
 	 *
