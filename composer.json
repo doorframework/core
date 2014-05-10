@@ -5,10 +5,10 @@
     "description": "The core of Door framework",
     "keywords": ["framerork","mvc"],
     "authors": [
-    {
-        "name": "Sachik Sergey",
-        "homepage": "http://serginho.ru/"
-    }
+		{
+			"name": "Sergey Sachik",
+			"homepage": "http://serginho.ru/"
+		}
     ],
     "require": {
         "php" : ">5.4"

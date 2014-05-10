@@ -8,29 +8,26 @@ use Door\Request\Exception;
  *
  * @author serginho
  */
-abstract class Request {
+class Request {
 	
 	protected $uri;
 	
 	/**
-	 * @var Router
+	 * @var Door
 	 */
-	protected $router;
+	protected $app;
+	
+	protected $path = array();	
 	
 	/**
-	 * @var  array   parameters from the route
+	 *
+	 * @var Response;
 	 */
-	protected $params = array();	
+	protected $response = null;
 	
-	protected $path = array();
-	
-	public function __construct($uri, Router $router = null) {
+	public function __construct($uri, Door $app) {
 		
-		//remove first slash
-		if(substr($uri, 0, 1) == "/")
-		{
-			$uri = substr($uri, 1);
-		}
+		$uri = trim($uri, "/");
 		
 		$this->uri = $uri;
 		if(strlen($uri) > 0)
@@ -38,26 +35,10 @@ abstract class Request {
 			$this->path = explode("/", $uri);
 		}
 		
-		$this->router = ($router === null) ? Door::$router : $router;
+		$this->app = $app;
 		
-	}
-	
-	public function param($name, $value = null)
-	{
-		if($value === null)
-		{
-			if(isset($this->params[$name]))
-			{
-				return $this->params[$name];
-			}
-		}
-		else
-		{
-			$this->params[$name] = $value;
-		}
-		
-		return null;
-	}
+		$this->response = new Response();				
+	}	
 	
 	public function path($index = null)
 	{
@@ -87,8 +68,15 @@ abstract class Request {
 	public function execute()
 	{
 		
-		
 		return $this;
+	}
+	
+	/**
+	 * @return Response
+	 */
+	public function response()
+	{
+		return $this->response;
 	}
 	
 	

@@ -5,6 +5,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+namespace Door\Core;
+use Door\Core\Helper\Arr;
 
 /**
  * Description of Response
@@ -71,27 +73,27 @@ class Response {
 	/**
 	 * @var  integer     The response http status
 	 */
-	protected $_status = 200;
+	protected $status = 200;
 
 	/**
-	 * @var  HTTP_Header  Headers returned in the response
+	 * @var  array
 	 */
-	protected $_header;
+	protected $headers;
 
 	/**
 	 * @var  string      The response body
 	 */
-	protected $_body = '';
+	protected $body = '';
 
 	/**
 	 * @var  array       Cookies to be returned in the response
 	 */
-	protected $_cookies = array();
+	protected $cookies = array();
 
 	/**
 	 * @var  string      The response protocol
 	 */
-	protected $_protocol;
+	protected $protocol;
 
 	/**
 	 * Sets up the response object
@@ -99,15 +101,15 @@ class Response {
 	 * @param   array $config Setup the response object
 	 * @return  void
 	 */
-	public function __construct()
+	public function __construct($config)
 	{
-		$this->_header = new HTTP_Header;
+		$this->header = new Header;
 
 		foreach ($config as $key => $value)
 		{
 			if (property_exists($this, $key))
 			{
-				if ($key == '_header')
+				if ($key == 'header')
 				{
 					$this->headers($value);
 				}
@@ -219,24 +221,24 @@ class Response {
 	 */
 	public function headers($key = NULL, $value = NULL)
 	{
-		if ($key === NULL)
+		if($value === null)
 		{
-			return $this->_header;
+			if(is_array($key))
+			{
+				foreach($key as $k => $value)
+				{
+					$this->headers($k, $value);
+				}
+				return $this;
+			}			
+			else
+			{
+				return Arr::get($this->headers, $key);
+			}
 		}
-		elseif (is_array($key))
-		{
-			$this->_header->exchangeArray($key);
-			return $this;
-		}
-		elseif ($value === NULL)
-		{
-			return Arr::get($this->_header, $key);
-		}
-		else
-		{
-			$this->_header[$key] = $value;
-			return $this;
-		}
+
+		$this->headers[$key] = $value;
+		return $this;
 	}
 
 	/**
@@ -248,84 +250,6 @@ class Response {
 	public function content_length()
 	{
 		return strlen($this->body());
-	}
-
-	/**
-	 * Set and get cookies values for this response.
-	 *
-	 *     // Get the cookies set to the response
-	 *     $cookies = $response->cookie();
-	 *
-	 *     // Set a cookie to the response
-	 *     $response->cookie('session', array(
-	 *          'value' => $value,
-	 *          'expiration' => 12352234
-	 *     ));
-	 *
-	 * @param   mixed   $key    cookie name, or array of cookie values
-	 * @param   string  $value  value to set to cookie
-	 * @return  string
-	 * @return  void
-	 * @return  [Response]
-	 */
-	public function cookie($key = NULL, $value = NULL)
-	{
-		// Handle the get cookie calls
-		if ($key === NULL)
-			return $this->_cookies;
-		elseif ( ! is_array($key) AND ! $value)
-			return Arr::get($this->_cookies, $key);
-
-		// Handle the set cookie calls
-		if (is_array($key))
-		{
-			reset($key);
-			while (list($_key, $_value) = each($key))
-			{
-				$this->cookie($_key, $_value);
-			}
-		}
-		else
-		{
-			if ( ! is_array($value))
-			{
-				$value = array(
-					'value' => $value,
-					'expiration' => Cookie::$expiration
-				);
-			}
-			elseif ( ! isset($value['expiration']))
-			{
-				$value['expiration'] = Cookie::$expiration;
-			}
-
-			$this->_cookies[$key] = $value;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Deletes a cookie set to the response
-	 *
-	 * @param   string  $name
-	 * @return  Response
-	 */
-	public function delete_cookie($name)
-	{
-		unset($this->_cookies[$name]);
-		return $this;
-	}
-
-	/**
-	 * Deletes all cookies from this response
-	 *
-	 * @return  Response
-	 */
-	public function delete_cookies()
-	{
-		$this->_cookies = array();
-		return $this;
 	}
 
 	/**

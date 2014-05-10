@@ -1,6 +1,8 @@
 <?php
 
 namespace Door\Core;
+use Door\Core\Helper\Arr;
+
 /**
  * Description of Controller
  *
@@ -9,39 +11,26 @@ namespace Door\Core;
 abstract class Controller {
 	
 	/**
-	 *
 	 * @var Request
 	 */
-	protected $request;
+	protected $request;		
 	
-	/**
-	 *
-	 * @var Context
-	 */
-	protected $context;
+	private $params = array();
 	
-	protected $path_index;
-	
-	protected $views = array();
-	
-	public function __construct(Request $request, array $config = array())
-	{
-	}
-	
-	final public function set_request(Request $request)
+	public function __construct(Request $request, array $params = array())
 	{
 		$this->request = $request;
+		$this->params = $params;
 	}
 	
-	final public function set_context(Context $context)
+	/**
+	 * get request parameter
+	 * @return mixed
+	 */
+	protected function param($name)
 	{
-		$this->context = $context;
+		return Arr::get($this->params, $name);
 	}
 	
-	final protected function get_view($name)
-	{
-		
-	}
-	
-	abstract public function run();	
+	public abstract function execute();	
 }
