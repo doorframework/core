@@ -18,7 +18,7 @@ class Redirect extends \Door\Core\Controller {
 		
 		if($this->request->uri() != $this->redirect_uri)
 		{
-			$this->redirect($this->redirect_uri);
+			$this->redirect($this->app->url->site($this->redirect_uri));
 		}
 		
 	}
