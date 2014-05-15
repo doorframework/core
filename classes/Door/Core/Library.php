@@ -17,11 +17,11 @@ abstract class Library {
 	
 	/**
 	 *
-	 * @var \Door\Core\Door
+	 * @var \Door\Core\Application
 	 */
 	protected $app;
 	
-	public function __construct(Door $app) {
+	public function __construct(Application $app) {
 		
 		$this->app = $app;
 		

@@ -25,7 +25,7 @@ class Request {
 	 */
 	protected $response = null;
 	
-	public function __construct($uri, Door $app) {
+	public function __construct($uri, Application $app) {
 		
 		$uri = trim($uri, "/");
 		

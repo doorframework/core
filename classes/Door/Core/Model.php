@@ -68,13 +68,13 @@ abstract class Model{
 	}
 	
 	/**
-	 * @param Door $app
+	 * @param Application $app
 	 * @param string $db
 	 * @param string $model_name
 	 * @param string $collection
 	 * @param string $id
 	 */
-	public function __construct(Door $app, $db, $model_name, $collection, $id = null)
+	public function __construct(Application $app, $db, $model_name, $collection, $id = null)
 	{
 		$this->_collection = $collection;
 		$this->_model_name = $model_name;
@@ -659,7 +659,7 @@ abstract class Model{
 	
 	/**
 	 * 
-	 * @return Door
+	 * @return Application
 	 */
 	public function app()
 	{

@@ -32,7 +32,7 @@ abstract class Controller {
 	 */
 	private $params = array();
 	
-	final public function __construct(Door $app, Request $request, array $params = array())
+	final public function __construct(Application $app, Request $request, array $params = array())
 	{
 		$this->request = $request;
 		$this->params = $params;

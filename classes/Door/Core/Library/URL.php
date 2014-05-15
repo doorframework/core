@@ -1,6 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 namespace Door\Core\Library;
+use Door\Core\Helper\UTF8;
 
 /**
  * URL helper class.
@@ -11,9 +12,11 @@ namespace Door\Core\Library;
  * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class URL extends Door\Core\Library {
+class URL extends \Door\Core\Library {
 
 	protected $hostname = null;
+	
+	protected $base_url = "";
 	
 	
 	public function hostname($hostname = null)
@@ -22,7 +25,17 @@ class URL extends Door\Core\Library {
 		{
 			$this->hostname = $hostname;
 		}
+		return $this->hostname;
 	}
+	
+	public function base_url($base_url = null)
+	{
+		if($base_url !== null)
+		{
+			$this->base_url = $base_url;
+		}
+		return $this->base_url;
+	}	
 	
 	
 	/**
@@ -49,7 +62,7 @@ class URL extends Door\Core\Library {
 	public function base($protocol = NULL, $index = FALSE)
 	{
 		// Start with the configured base URL
-		$base_url = Kohana::$base_url;
+		$base_url = $this->base_url;
 
 		if ($protocol === TRUE)
 		{

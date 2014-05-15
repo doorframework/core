@@ -23,7 +23,7 @@ use Exception;
  * @param \Door\Core\Library\URL $url
  * @param \Door\Core\Library\Views $views
  */
-class Door {
+class Application {
 
 	// Release version
 	const VERSION  = '0.0.1';

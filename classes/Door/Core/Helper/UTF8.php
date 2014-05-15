@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php 
+
+
+namespace Door\Core\Helper;
 /**
  * A port of [phputf8](http://phputf8.sourceforge.net/) to a unified set
  * of files. Provides multi-byte aware replacement string functions.
@@ -21,7 +24,7 @@
  * @copyright  (c) 2005 Harry Fuecks
  * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class Kohana_UTF8 {
+class UTF8 {
 
 	/**
 	 * @var  boolean  Does the server support UTF-8 natively?
@@ -758,8 +761,8 @@ class Kohana_UTF8 {
 
 }
 
-if (Kohana_UTF8::$server_utf8 === NULL)
+if (UTF8::$server_utf8 === NULL)
 {
 	// Determine if this server supports UTF-8 natively
-	Kohana_UTF8::$server_utf8 = extension_loaded('mbstring');
+	UTF8::$server_utf8 = extension_loaded('mbstring');
 }
