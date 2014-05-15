@@ -17,6 +17,8 @@ class Auth extends \Door\Core\Library {
 	public $hash_key = null;
 	
 	public $hash_method = "ripemd160";
+	
+	public $lifetime = 0;
 
 	/**
 	 * Checks if a session is active.
@@ -102,7 +104,7 @@ class Auth extends \Door\Core\Library {
 				// Token data
 				$data = array(
 					'user_id'    => $user->pk(),
-					'expires'    => time() + $this->_config['lifetime']
+					'expires'    => time() + $this->lifetime
 				);
 
 				// Create a new autologin token
@@ -192,7 +194,7 @@ class Auth extends \Door\Core\Library {
 	 */
 	public function get_user($default = NULL)
 	{
-		$user = $this->app->session->get($this->_config['session_key'], $default);
+		$user = $this->app->session->get($this->session_key, $default);
 
 		if ($user === $default)
 		{

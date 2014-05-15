@@ -50,7 +50,7 @@ class Session extends \Door\Core\Library {
 	public function __toString()
 	{
 		// Serialize the data array
-		$data = $this->serialize($this->_data);
+		$data = $this->serialize($this->data);
 
 		$data = $this->encode($data);
 
@@ -71,7 +71,7 @@ class Session extends \Door\Core\Library {
 	 */
 	public function & as_array()
 	{
-		return $this->_data;
+		return $this->data;
 	}
 
 	/**
@@ -98,7 +98,7 @@ class Session extends \Door\Core\Library {
 	 */
 	public function get($key, $default = NULL)
 	{
-		return array_key_exists($key, $this->_data) ? $this->_data[$key] : $default;
+		return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
 	}
 
 	/**
@@ -114,7 +114,7 @@ class Session extends \Door\Core\Library {
 	{
 		$value = $this->get($key, $default);
 
-		unset($this->_data[$key]);
+		unset($this->data[$key]);
 
 		return $value;
 	}
@@ -130,7 +130,7 @@ class Session extends \Door\Core\Library {
 	 */
 	public function set($key, $value)
 	{
-		$this->_data[$key] = $value;
+		$this->data[$key] = $value;
 
 		return $this;
 	}
@@ -146,7 +146,7 @@ class Session extends \Door\Core\Library {
 	 */
 	public function bind($key, & $value)
 	{
-		$this->_data[$key] =& $value;
+		$this->data[$key] =& $value;
 
 		return $this;
 	}
@@ -165,7 +165,7 @@ class Session extends \Door\Core\Library {
 
 		foreach ($args as $key)
 		{
-			unset($this->_data[$key]);
+			unset($this->data[$key]);
 		}
 
 		return $this;
@@ -206,7 +206,7 @@ class Session extends \Door\Core\Library {
 		if (is_array($data))
 		{
 			// Load the data locally
-			$this->_data = $data;
+			$this->data = $data;
 		}
 	}
 
@@ -244,7 +244,7 @@ class Session extends \Door\Core\Library {
 		}
 
 		// Set the last active timestamp
-		$this->_data['last_active'] = time();
+		$this->data['last_active'] = time();
 
 		try
 		{
@@ -273,7 +273,7 @@ class Session extends \Door\Core\Library {
 			if ($this->_destroyed = $this->_destroy())
 			{
 				// The session has been destroyed, clear all data
-				$this->_data = array();
+				$this->data = array();
 			}
 		}
 
@@ -378,7 +378,7 @@ class Session extends \Door\Core\Library {
 		session_start();
 
 		// Use the $_SESSION global for storing data
-		$this->_data =& $_SESSION;
+		$this->data =& $_SESSION;
 
 		return NULL;
 	}
@@ -414,7 +414,7 @@ class Session extends \Door\Core\Library {
 		$status = session_start();
 
 		// Use the $_SESSION global for storing data
-		$this->_data =& $_SESSION;
+		$this->data =& $_SESSION;
 
 		return $status;
 	}
