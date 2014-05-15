@@ -129,6 +129,8 @@ class URL extends \Door\Core\Library {
 	 */
 	public function site($uri = '', $protocol = NULL, $index = TRUE)
 	{
+		return "/".$uri;
+		/*
 		// Chop off possible scheme, host, port, user and pass parts
 		$path = preg_replace('~^[-a-z0-9+.]++://[^/]++/?~', '', trim($uri, '/'));
 
@@ -139,7 +141,7 @@ class URL extends \Door\Core\Library {
 		}
 
 		// Concat the URL
-		return URL::base($protocol, $index).$path;
+		return URL::base($protocol, $index).$path;*/
 	}
 
 	/**
