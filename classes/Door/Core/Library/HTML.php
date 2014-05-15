@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+namespace Door\Core\Library;
 /**
  * HTML helper class. Provides generic methods for generating various HTML
  * tags and making output HTML safe.
@@ -9,12 +11,12 @@
  * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class Kohana_HTML {
+class HTML extends \Door\Core\Library{
 
 	/**
 	 * @var  array  preferred order of attributes
 	 */
-	public static $attribute_order = array
+	protected $attribute_order = array
 	(
 		'action',
 		'method',
@@ -49,24 +51,24 @@ class Kohana_HTML {
 	/**
 	 * @var  boolean  use strict XHTML mode?
 	 */
-	public static $strict = TRUE;
+	public $strict = TRUE;
 
 	/**
 	 * @var  boolean  automatically target external URLs to a new window?
 	 */
-	public static $windowed_urls = FALSE;
+	public $windowed_urls = FALSE;
 
 	/**
 	 * Convert special characters to HTML entities. All untrusted content
 	 * should be passed through this method to prevent XSS injections.
 	 *
-	 *     echo HTML::chars($username);
+	 *     echo $this->chars($username);
 	 *
 	 * @param   string  $value          string to convert
 	 * @param   boolean $double_encode  encode existing entities
 	 * @return  string
 	 */
-	public static function chars($value, $double_encode = TRUE)
+	public function chars($value, $double_encode = TRUE)
 	{
 		return htmlspecialchars( (string) $value, ENT_QUOTES, Kohana::$charset, $double_encode);
 	}
@@ -76,13 +78,13 @@ class Kohana_HTML {
 	 * that cannot be represented in HTML with the current character set
 	 * will be converted to entities.
 	 *
-	 *     echo HTML::entities($username);
+	 *     echo $this->entities($username);
 	 *
 	 * @param   string  $value          string to convert
 	 * @param   boolean $double_encode  encode existing entities
 	 * @return  string
 	 */
-	public static function entities($value, $double_encode = TRUE)
+	public function entities($value, $double_encode = TRUE)
 	{
 		return htmlentities( (string) $value, ENT_QUOTES, Kohana::$charset, $double_encode);
 	}
@@ -91,19 +93,19 @@ class Kohana_HTML {
 	 * Create HTML link anchors. Note that the title is not escaped, to allow
 	 * HTML elements within links (images, etc).
 	 *
-	 *     echo HTML::anchor('/user/profile', 'My Profile');
+	 *     echo $this->anchor('/user/profile', 'My Profile');
 	 *
 	 * @param   string  $uri        URL or URI string
 	 * @param   string  $title      link text
 	 * @param   array   $attributes HTML anchor attributes
-	 * @param   mixed   $protocol   protocol to pass to URL::base()
+	 * @param   mixed   $protocol   protocol to pass to $this->app->url->base()
 	 * @param   boolean $index      include the index page
 	 * @return  string
-	 * @uses    URL::base
-	 * @uses    URL::site
-	 * @uses    HTML::attributes
+	 * @uses    $this->app->url->base
+	 * @uses    $this->app->url->site
+	 * @uses    $this->attributes
 	 */
-	public static function anchor($uri, $title = NULL, array $attributes = NULL, $protocol = NULL, $index = TRUE)
+	public function anchor($uri, $title = NULL, array $attributes = NULL, $protocol = NULL, $index = TRUE)
 	{
 		if ($title === NULL)
 		{
@@ -114,13 +116,13 @@ class Kohana_HTML {
 		if ($uri === '')
 		{
 			// Only use the base URL
-			$uri = URL::base($protocol, $index);
+			$uri = $this->app->url->base($protocol, $index);
 		}
 		else
 		{
 			if (strpos($uri, '://') !== FALSE)
 			{
-				if (HTML::$windowed_urls === TRUE AND empty($attributes['target']))
+				if ($this->windowed_urls === TRUE AND empty($attributes['target']))
 				{
 					// Make the link open in a new window
 					$attributes['target'] = '_blank';
@@ -129,32 +131,32 @@ class Kohana_HTML {
 			elseif ($uri[0] !== '#')
 			{
 				// Make the URI absolute for non-id anchors
-				$uri = URL::site($uri, $protocol, $index);
+				$uri = $this->app->url->site($uri, $protocol, $index);
 			}
 		}
 
 		// Add the sanitized link to the attributes
 		$attributes['href'] = $uri;
 
-		return '<a'.HTML::attributes($attributes).'>'.$title.'</a>';
+		return '<a'.$this->attributes($attributes).'>'.$title.'</a>';
 	}
 
 	/**
 	 * Creates an HTML anchor to a file. Note that the title is not escaped,
 	 * to allow HTML elements within links (images, etc).
 	 *
-	 *     echo HTML::file_anchor('media/doc/user_guide.pdf', 'User Guide');
+	 *     echo $this->file_anchor('media/doc/user_guide.pdf', 'User Guide');
 	 *
 	 * @param   string  $file       name of file to link to
 	 * @param   string  $title      link text
 	 * @param   array   $attributes HTML anchor attributes
-	 * @param   mixed   $protocol   protocol to pass to URL::base()
+	 * @param   mixed   $protocol   protocol to pass to $this->app->url->base()
 	 * @param   boolean $index      include the index page
 	 * @return  string
-	 * @uses    URL::base
-	 * @uses    HTML::attributes
+	 * @uses    $this->app->url->base
+	 * @uses    $this->attributes
 	 */
-	public static function file_anchor($file, $title = NULL, array $attributes = NULL, $protocol = NULL, $index = FALSE)
+	public function file_anchor($file, $title = NULL, array $attributes = NULL, $protocol = NULL, $index = FALSE)
 	{
 		if ($title === NULL)
 		{
@@ -163,24 +165,24 @@ class Kohana_HTML {
 		}
 
 		// Add the file link to the attributes
-		$attributes['href'] = URL::site($file, $protocol, $index);
+		$attributes['href'] = $this->app->url->site($file, $protocol, $index);
 
-		return '<a'.HTML::attributes($attributes).'>'.$title.'</a>';
+		return '<a'.$this->attributes($attributes).'>'.$title.'</a>';
 	}
 
 	/**
 	 * Creates an email (mailto:) anchor. Note that the title is not escaped,
 	 * to allow HTML elements within links (images, etc).
 	 *
-	 *     echo HTML::mailto($address);
+	 *     echo $this->mailto($address);
 	 *
 	 * @param   string  $email      email address to send to
 	 * @param   string  $title      link text
 	 * @param   array   $attributes HTML anchor attributes
 	 * @return  string
-	 * @uses    HTML::attributes
+	 * @uses    $this->attributes
 	 */
-	public static function mailto($email, $title = NULL, array $attributes = NULL)
+	public function mailto($email, $title = NULL, array $attributes = NULL)
 	{
 		if ($title === NULL)
 		{
@@ -188,28 +190,28 @@ class Kohana_HTML {
 			$title = $email;
 		}
 
-		return '<a href="&#109;&#097;&#105;&#108;&#116;&#111;&#058;'.$email.'"'.HTML::attributes($attributes).'>'.$title.'</a>';
+		return '<a href="&#109;&#097;&#105;&#108;&#116;&#111;&#058;'.$email.'"'.$this->attributes($attributes).'>'.$title.'</a>';
 	}
 
 	/**
 	 * Creates a style sheet link element.
 	 *
-	 *     echo HTML::style('media/css/screen.css');
+	 *     echo $this->style('media/css/screen.css');
 	 *
 	 * @param   string  $file       file name
 	 * @param   array   $attributes default attributes
-	 * @param   mixed   $protocol   protocol to pass to URL::base()
+	 * @param   mixed   $protocol   protocol to pass to $this->app->url->base()
 	 * @param   boolean $index      include the index page
 	 * @return  string
-	 * @uses    URL::base
-	 * @uses    HTML::attributes
+	 * @uses    $this->app->url->base
+	 * @uses    $this->attributes
 	 */
-	public static function style($file, array $attributes = NULL, $protocol = NULL, $index = FALSE)
+	public function style($file, array $attributes = NULL, $protocol = NULL, $index = FALSE)
 	{
 		if (strpos($file, '://') === FALSE)
 		{
 			// Add the base URL
-			$file = URL::site($file, $protocol, $index);
+			$file = $this->app->url->site($file, $protocol, $index);
 		}
 
 		// Set the stylesheet link
@@ -221,28 +223,28 @@ class Kohana_HTML {
 		// Set the stylesheet type
 		$attributes['type'] = 'text/css';
 
-		return '<link'.HTML::attributes($attributes).' />';
+		return '<link'.$this->attributes($attributes).' />';
 	}
 
 	/**
 	 * Creates a script link.
 	 *
-	 *     echo HTML::script('media/js/jquery.min.js');
+	 *     echo $this->script('media/js/jquery.min.js');
 	 *
 	 * @param   string  $file       file name
 	 * @param   array   $attributes default attributes
-	 * @param   mixed   $protocol   protocol to pass to URL::base()
+	 * @param   mixed   $protocol   protocol to pass to $this->app->url->base()
 	 * @param   boolean $index      include the index page
 	 * @return  string
-	 * @uses    URL::base
-	 * @uses    HTML::attributes
+	 * @uses    $this->app->url->base
+	 * @uses    $this->attributes
 	 */
-	public static function script($file, array $attributes = NULL, $protocol = NULL, $index = FALSE)
+	public function script($file, array $attributes = NULL, $protocol = NULL, $index = FALSE)
 	{
 		if (strpos($file, '://') === FALSE)
 		{
 			// Add the base URL
-			$file = URL::site($file, $protocol, $index);
+			$file = $this->app->url->site($file, $protocol, $index);
 		}
 
 		// Set the script link
@@ -251,52 +253,52 @@ class Kohana_HTML {
 		// Set the script type
 		$attributes['type'] = 'text/javascript';
 
-		return '<script'.HTML::attributes($attributes).'></script>';
+		return '<script'.$this->attributes($attributes).'></script>';
 	}
 
 	/**
 	 * Creates a image link.
 	 *
-	 *     echo HTML::image('media/img/logo.png', array('alt' => 'My Company'));
+	 *     echo $this->image('media/img/logo.png', array('alt' => 'My Company'));
 	 *
 	 * @param   string  $file       file name
 	 * @param   array   $attributes default attributes
-	 * @param   mixed   $protocol   protocol to pass to URL::base()
+	 * @param   mixed   $protocol   protocol to pass to $this->app->url->base()
 	 * @param   boolean $index      include the index page
 	 * @return  string
-	 * @uses    URL::base
-	 * @uses    HTML::attributes
+	 * @uses    $this->app->url->base
+	 * @uses    $this->attributes
 	 */
-	public static function image($file, array $attributes = NULL, $protocol = NULL, $index = FALSE)
+	public function image($file, array $attributes = NULL, $protocol = NULL, $index = FALSE)
 	{
 		if (strpos($file, '://') === FALSE)
 		{
 			// Add the base URL
-			$file = URL::site($file, $protocol, $index);
+			$file = $this->app->url->site($file, $protocol, $index);
 		}
 
 		// Add the image link
 		$attributes['src'] = $file;
 
-		return '<img'.HTML::attributes($attributes).' />';
+		return '<img'.$this->attributes($attributes).' />';
 	}
 
 	/**
 	 * Compiles an array of HTML attributes into an attribute string.
-	 * Attributes will be sorted using HTML::$attribute_order for consistency.
+	 * Attributes will be sorted using $this->attribute_order for consistency.
 	 *
-	 *     echo '<div'.HTML::attributes($attrs).'>'.$content.'</div>';
+	 *     echo '<div'.$this->attributes($attrs).'>'.$content.'</div>';
 	 *
 	 * @param   array   $attributes attribute list
 	 * @return  string
 	 */
-	public static function attributes(array $attributes = NULL)
+	public function attributes(array $attributes = NULL)
 	{
 		if (empty($attributes))
 			return '';
 
 		$sorted = array();
-		foreach (HTML::$attribute_order as $key)
+		foreach ($this->attribute_order as $key)
 		{
 			if (isset($attributes[$key]))
 			{
@@ -322,7 +324,7 @@ class Kohana_HTML {
 				// Assume non-associative keys are mirrored attributes
 				$key = $value;
 
-				if ( ! HTML::$strict)
+				if ( ! $this->strict)
 				{
 					// Just use a key
 					$value = FALSE;
@@ -332,10 +334,10 @@ class Kohana_HTML {
 			// Add the attribute key
 			$compiled .= ' '.$key;
 
-			if ($value OR HTML::$strict)
+			if ($value OR $this->strict)
 			{
 				// Add the attribute value
-				$compiled .= '="'.HTML::chars($value).'"';
+				$compiled .= '="'.$this->chars($value).'"';
 			}
 		}
 

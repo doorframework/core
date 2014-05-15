@@ -3,6 +3,7 @@
 namespace Door\Core\Controller;
 use Door\Core\Controller;
 use Door\Core\View;
+use Door\Core\Helper\HTML;
 
 /**
  * Layout controller. Can be only one layout controller for request.
@@ -100,13 +101,13 @@ abstract class Layout extends Controller{
 		$scripts = $this->get_scripts_uris($this->scripts, self::JS_EXT);
 		foreach($scripts as $script)
 		{
-			$return_value .= HTML::script($script)."\n";
+			$return_value .= $this->app->html->script($script)."\n";
 		}	
 		
 		$styles = $this->get_scripts_uris($this->styles, self::CSS_EXT);
 		foreach($styles as $style)
 		{
-			$return_value .= HTML::style($style)."\n";
+			$return_value .= $this->app->html->style($style)."\n";
 		}		
 		
 		$data = array(
@@ -157,7 +158,6 @@ abstract class Layout extends Controller{
 				else
 				{
 					$uris[] = "media/".$script_config['file'].".".$ext;
-					$uris[] = Door::path_to_uri($filepath);
 				}
 			}		
 		}
