@@ -12,7 +12,11 @@ namespace Door\Core\Library;
  */
 class Auth extends \Door\Core\Library {
 	
-
+	protected $session_key = 'session';
+	
+	public $hash_key = null;
+	
+	public $hash_method = "ripemd160";
 
 	/**
 	 * Checks if a session is active.
@@ -297,7 +301,7 @@ class Auth extends \Door\Core\Library {
 		else
 		{
 			// Remove the user from the session
-			$this->app->session->delete($this->_config['session_key']);
+			$this->app->session->delete($this->session_key);
 
 			// Regenerate session_id
 			$this->app->session->regenerate();
@@ -327,10 +331,13 @@ class Auth extends \Door\Core\Library {
 	 */
 	public function hash($str)
 	{
-		if ( ! $this->_config['hash_key'])
-			throw new Kohana_Exception('A valid hash key must be set in your auth config.');
+		if( ! isset($this->hash_key))
+		{
+			throw new Kohana_Exception('A valid hash key must be set in your auth.');
+		}
+			
 
-		return hash_hmac($this->_config['hash_method'], $str, $this->_config['hash_key']);
+		return hash_hmac($this->hash_method, $str, $this->hash_key);
 	}
 
 	protected function complete_login($user)
@@ -340,7 +347,7 @@ class Auth extends \Door\Core\Library {
 		$this->app->session->regenerate();
 
 		// Store username in session
-		$this->app->session->set($this->_config['session_key'], $user);
+		$this->app->session->set($this->session_key, $user);
 
 		return TRUE;
 	}
