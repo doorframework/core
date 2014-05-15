@@ -39,7 +39,7 @@ class Models extends \Door\Core\Library {
 	 * @return Model
 	 * @throws Exception
 	 */
-	public function factory($model_name, $id)
+	public function factory($model_name, $id = null)
 	{
 		if( ! $this->model_registered($model_name))
 		{
