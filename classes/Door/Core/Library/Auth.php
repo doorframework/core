@@ -37,7 +37,7 @@ class Auth extends \Door\Core\Library {
 			if (is_array($role))
 			{
 				// Get all the roles
-				$roles = Model::factory('Role')
+				$roles = $this->app->models->factory('Role')
 							->where('_id', 'IN', $role)
 							->find_all()
 							->as_array(NULL, '_id');
@@ -98,8 +98,7 @@ class Auth extends \Door\Core\Library {
 				// Token data
 				$data = array(
 					'user_id'    => $user->pk(),
-					'expires'    => time() + $this->_config['lifetime'],
-					'user_agent' => sha1(Request::$user_agent),
+					'expires'    => time() + $this->_config['lifetime']
 				);
 
 				// Create a new autologin token
@@ -163,23 +162,17 @@ class Auth extends \Door\Core\Library {
 
 			if ($token->loaded() AND $token->user->loaded())
 			{
-				if ($token->user_agent === sha1(Request::$user_agent))
-				{
-					// Save the token to create a new unique token
-					$token->save();
+				// Save the token to create a new unique token
+				$token->save();
 
-					// Set the new token
-					$this->app->cookie->set('authautologin', $token->token, $token->expires - time());
+				// Set the new token
+				$this->app->cookie->set('authautologin', $token->token, $token->expires - time());
 
-					// Complete the login with the found data
-					$this->complete_login($token->user);
+				// Complete the login with the found data
+				$this->complete_login($token->user);
 
-					// Automatic login was successful
-					return $token->user;
-				}
-
-				// Token is invalid
-				$token->delete();
+				// Automatic login was successful
+				return $token->user;
 			}
 		}
 
