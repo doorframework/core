@@ -260,11 +260,11 @@ class Media extends \Door\Core\Library {
 				
 		usort($success_paths, function($a, $b)
 		{
-			if ($a['sort'] == $b['sort'])
+			if ($a['priority'] == $b['priority'])
 			{
 				return 0;
 			}
-			else if ($a['sort'] > $b['sort'])
+			else if ($a['priority'] > $b['priority'])
 			{
 				return -1;
 			}

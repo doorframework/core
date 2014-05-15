@@ -12,11 +12,11 @@ namespace Door\Core\Library;
  */
 class Auth extends \Door\Core\Library {
 	
-	protected $session_key = 'session';
+	public $session_key = 'session';
 	
 	public $hash_key = null;
 	
-	public $hash_method = "ripemd160";
+	public $hash_method = "md5";
 	
 	public $lifetime = 0;
 
