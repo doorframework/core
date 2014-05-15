@@ -7,6 +7,7 @@
 
 namespace Door\Core\Library;
 use \Door\Core\Model as Model;
+use \Exeption;
 
 /**
  * Description of Models
@@ -46,13 +47,13 @@ class Models extends \Door\Core\Library {
 			throw new Exception("model {$model_name} not found");
 		}
 		
-		$data = $this->registered_models[$model];
+		$data = $this->registered_models[$model_name];
 		$class_name = $data['class_name'];	
 				
 		return new $class_name($this->app, $data['db'], $model_name, $data['collection'], $id);	 		
 	}
 	
-	public function model_registered($model)
+	public function model_registered($model_name)
 	{
 		return isset($this->registered_models[$model_name]);
 	}
