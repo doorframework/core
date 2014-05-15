@@ -11,8 +11,6 @@
  * @author serginho
  */
 class Role {
-
-	protected $_collection = "roles";
 	
 	protected function initialize()
 	{

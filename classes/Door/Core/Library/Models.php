@@ -21,7 +21,7 @@ class Models extends \Door\Core\Library {
 	
 	protected $collections = array();
 	
-	public function register($model_name, $class_name, $collection, $db = 'default')
+	public function add($model_name, $class_name, $collection, $db = 'default')
 	{
 		$this->registered_models[$model_name] = array(
 			'class_name' => $class_name,

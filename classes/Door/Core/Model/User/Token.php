@@ -12,8 +12,6 @@ namespace Door\Core\Model\User;
  */
 class Token extends \Door\Core\Model {
 	
-	protected $_collection = "user_tokens";
-	
 	protected $_created_column = "created";
 	
 	public function initialize() {

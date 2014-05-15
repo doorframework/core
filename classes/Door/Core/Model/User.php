@@ -14,8 +14,6 @@ namespace Door\Core\Model;
  */
 class User extends \Door\Core\Model{
 	
-	protected $_collection = "users";
-	
 	protected function initialize()
 	{
 		parent::initialize();

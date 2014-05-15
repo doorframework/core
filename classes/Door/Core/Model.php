@@ -74,7 +74,7 @@ abstract class Model{
 	 * @param string $collection
 	 * @param string $id
 	 */
-	public function __construct(Application $app, $db, $model_name, $collection, $id = null)
+	final public function __construct(Application $app, $db, $model_name, $collection, $id = null)
 	{
 		$this->_collection = $collection;
 		$this->_model_name = $model_name;
@@ -112,6 +112,13 @@ abstract class Model{
 			}
 			
 		}
+		
+		$this->after_construct();
+	}
+	
+	protected function after_construct()
+	{
+		
 	}
 	
 	
