@@ -156,11 +156,7 @@ abstract class Layout extends Controller{
 				}				
 				else
 				{
-					$filepath = Kohana::find_file("media", $script_config['file'], $ext);
-					if($filepath === false)
-					{
-						throw new Exception("media file '{$script_config['file']}' not found");
-					}
+					$uris[] = "media/".$script_config['file'].".".$ext;
 					$uris[] = Door::path_to_uri($filepath);
 				}
 			}		
