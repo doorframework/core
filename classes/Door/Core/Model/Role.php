@@ -11,5 +11,34 @@
  * @author serginho
  */
 class Role {
-	//put your code here
+
+	protected $_collection = "roles";
+	
+	protected function initialize()
+	{
+		$this->_fields += array(
+			"_id" => array(
+				"type" => "string"
+			)
+		);
+		
+		parent::initialize();
+		
+		$this->_fields += array(
+			'description' => array(
+				'type' => 'string'
+			),	
+		);
+		
+		$this->_relations += array(
+			'users' => array(
+				'model' => 'User',
+				'type' => 'many_to_many',
+				'store' => false,
+				'foreignKey' => 'roles'
+			),
+
+		);				
+	}	
+	
 }
