@@ -109,12 +109,7 @@ abstract class Layout extends Controller{
 		{
 			$return_value .= $this->app->html->style($style)."\n";
 		}		
-		
-		$data = array(
-			'layout' => $this,
-			'headers' => &$return_value
-		);
-		Event::run("Controller_Layout.render_headers", $data);
+
 		
 		return $return_value;
 	}

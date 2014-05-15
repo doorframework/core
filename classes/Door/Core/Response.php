@@ -389,7 +389,6 @@ class Response {
 		$this->header['content-disposition'] = $disposition.'; filename="'.$download.'"';
 		$this->header['content-type']        = $mime;
 		$this->header['content-length']      = (string) (($end - $start) + 1);
-
 		
 		// Send all headers now
 		$this->send_headers();

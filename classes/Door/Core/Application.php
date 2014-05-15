@@ -52,6 +52,12 @@ class Application {
 	private $libraries = array();
 	
 	protected $charset = 'utf-8';
+	
+	/**
+	 *
+	 * @var Request
+	 */
+	private $initial_request = null;
 
 	
 	/**
@@ -76,7 +82,7 @@ class Application {
 		$this->modules_objects = array();
 		$this->libraries = array();
 		$this->registered_libraries = array();
-		
+		$this->initial_request = null;
 		$this->initialized = false;
 	}
 	
@@ -112,6 +118,30 @@ class Application {
 		return isset($this->registered_libraries[$name]);
 	}
 	
+	public function set_initial_request(Request $request)
+	{
+		$this->initial_request = $request;
+	}
+	
+	/**
+	 * 
+	 * @return Request
+	 */
+	public function initial_request()
+	{
+		if( $this->initial_request !== null)
+		{
+			return $this->initial_request;
+		}
+		$uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "";
+		return $this->request($uri);
+	}	
+	
+	/**
+	 * 
+	 * @param string $uri
+	 * @return \Door\Core\Request
+	 */
 	public function request($uri)
 	{				
 		return new Request(trim($uri, "/"), $this);

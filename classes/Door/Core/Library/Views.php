@@ -84,6 +84,14 @@ class Views extends \Door\Core\Library {
 			$name = htmlspecialchars($name);
 			throw new Exception("View {$name} not found");
 		}
+		
+		if($data === null)
+		{
+			$data = array();
+		}
+		
+		$data['app'] = $this->app;
+		
 		return new View($path, $data);				
 	}
 	
