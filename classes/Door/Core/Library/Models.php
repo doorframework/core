@@ -25,7 +25,7 @@ class Models extends \Door\Core\Library {
 	public function add($model_name, $class_name, $collection, $db = 'default')
 	{
 		$this->registered_models[$model_name] = array(
-			'class_name' => $class_name,
+			'class_name' => str_replace("/", "\\", $class_name),
 			'collection' => $collection,
 			'db' => $db
 		);
