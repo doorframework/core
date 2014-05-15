@@ -89,11 +89,6 @@ class URL extends \Door\Core\Library {
 			$protocol = parse_url($base_url, PHP_URL_SCHEME);
 		}
 
-		if ($index === TRUE AND ! empty(Kohana::$index_file))
-		{
-			// Add the index file to the URL
-			$base_url .= Kohana::$index_file.'/';
-		}
 
 		if (is_string($protocol))
 		{
