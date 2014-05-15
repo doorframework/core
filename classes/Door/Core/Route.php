@@ -46,9 +46,9 @@ class Route {
 
 	public function __construct($uri, $controller_class, array $regex = array())
 	{
-		$this->uri = $uri;
+		$this->uri = trim($uri, "/");
 		
-		$this->controller_class = $controller_class;
+		$this->controller_class = str_replace("/", "\\", $controller_class);
 		
 		$this->regex = $regex;
 		
@@ -70,10 +70,10 @@ class Route {
 		// Insert default regex for keys
 		$expression = str_replace(array('<', '>'), array('(?P<', '>'.self::REGEX_SEGMENT.')'), $expression);
 
-		if ($regex)
+		if ($this->regex)
 		{
 			$search = $replace = array();
-			foreach ($regex as $key => $value)
+			foreach ($this->regex as $key => $value)
 			{
 				$search[]  = "<$key>".self::REGEX_SEGMENT;
 				$replace[] = "<$key>$value";
@@ -110,7 +110,7 @@ class Route {
 		// Get the URI from the Request
 		$uri = trim($request->uri(), '/');
 
-		if ( ! preg_match($this->_route_regex, $uri, $matches))
+		if ( ! preg_match($this->compiled_regex, $uri, $matches))
 			return FALSE;
 
 		$params = array();
@@ -224,7 +224,7 @@ class Route {
 			return array($result, $required);
 		};
 
-		list($uri) = $compile($this->_uri, TRUE);
+		list($uri) = $compile($this->uri, TRUE);
 
 		return $uri;
 	}	

@@ -1,9 +1,9 @@
 {
-    "name": "door/core",
+    "name": "doorframework/core",
     "license": "MIT",
     "type": "library",
     "description": "The core of Door framework",
-    "keywords": ["framerork","mvc"],
+    "keywords": ["framework","mvc"],
     "authors": [
 		{
 			"name": "Sergey Sachik",

@@ -37,7 +37,7 @@ class Router extends \Door\Core\Library {
 	 * @param   array   $regex          regex patterns for route keys
 	 * @return  Route
 	 */	
-	public function add($name, $uri, $controller_class, $regex){
+	public function add($name, $uri, $controller_class, array $regex = array()){
 		
 		return $this->routes[$name] = new Route($uri, $controller_class, $regex);
 		
@@ -80,7 +80,7 @@ class Router extends \Door\Core\Library {
 			if($params !== false)			
 			{
 				$controller_class = $route->controller();
-				return new $controller_class($request, $params);
+				return new $controller_class($this->app, $request, $params);
 			}
 		}
 		

@@ -16,6 +16,7 @@ use Exception;
  * @param \Door\Core\Library\Events $events
  * @param \Door\Core\Library\HTML $html
  * @param \Door\Core\Library\Image $image
+ * @param \Door\Core\Library\Layout $layout
  * @param \Door\Core\Library\Media $media
  * @param \Door\Core\Library\Models $models
  * @param \Door\Core\Library\Router $router
@@ -24,7 +25,7 @@ use Exception;
  */
 class Door {
 
-	// Release version and codename
+	// Release version
 	const VERSION  = '0.0.1';
 
 	// Common environment type constants for consistency and convenience
@@ -32,18 +33,6 @@ class Door {
 	const STAGING     = 20;
 	const TESTING     = 30;
 	const DEVELOPMENT = 40;
-	
-	/**
-	 * Is application initialized
-	 * @var bool
-	 */
-	private $initialized = false;
-	
-	/**
-	 * Application charset
-	 * @var string
-	 */
-	private $charset = 'utf-8';
 
 	/**
 	 * @var string 
@@ -61,23 +50,14 @@ class Door {
 	 * @var array
 	 */
 	private $libraries = array();
-	
 
 	
 	/**
 	 * Creating aplication. 
 	 * @param int $environment
-	 * @param string $charset
-	 * @throws Exception
 	 */
-	public function __construct($environment = self::DEVELOPMENT, $charset = null){
-					
+	public function __construct($environment = self::DEVELOPMENT){					
 		$this->environment = $environment;		
-		
-		if($charset !== null)
-		{
-			$this->charset = $charset;
-		}				
 	}					
 	
 	/**
@@ -87,11 +67,6 @@ class Door {
 	public function environment()
 	{
 		return $this->environment;
-	}
-	
-	public function init()
-	{
-		$this->initialized = true;
 	}
 	
 	public function unload()
@@ -135,18 +110,9 @@ class Door {
 		return isset($this->registered_libraries[$name]);
 	}
 	
-	/**
-	 * Get application charset
-	 * @return string
-	 */
-	public function charset()
-	{
-		return $this->charset;
-	}
-	
 	public function request($uri)
-	{
-		return new Request($uri, $this);
+	{				
+		return new Request(trim($uri, "/"), $this);
 	}
 	
 	

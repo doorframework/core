@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 namespace Door\Core;
 
@@ -46,11 +46,6 @@ class View {
 		// Import the view variables to local namespace
 		extract($kohana_view_data, EXTR_SKIP);
 
-		if (View::$_global_data)
-		{
-			// Import the global view variables to local namespace
-			extract(View::$_global_data, EXTR_SKIP | EXTR_REFS);
-		}
 
 		// Capture the view output
 		ob_start();
@@ -122,10 +117,6 @@ class View {
 		{
 			return $this->_data[$key];
 		}
-		elseif (array_key_exists($key, View::$_global_data))
-		{
-			return View::$_global_data[$key];
-		}
 		else
 		{
 			throw new Kohana_Exception('View variable is not set: :var',
@@ -159,7 +150,7 @@ class View {
 	 */
 	public function __isset($key)
 	{
-		return (isset($this->_data[$key]) OR isset(View::$_global_data[$key]));
+		return (isset($this->_data[$key]));
 	}
 
 	/**
@@ -172,7 +163,7 @@ class View {
 	 */
 	public function __unset($key)
 	{
-		unset($this->_data[$key], View::$_global_data[$key]);
+		unset($this->_data[$key]);
 	}
 
 	/**
@@ -212,15 +203,9 @@ class View {
 	 */
 	public function set_filename($file)
 	{
-		if (($path = Kohana::find_file('views', $file)) === FALSE)
-		{
-			throw new View_Exception('The requested view :file could not be found', array(
-				':file' => $file,
-			));
-		}
 
 		// Store the file path locally
-		$this->_file = $path;
+		$this->_file = $file;
 
 		return $this;
 	}

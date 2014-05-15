@@ -16,7 +16,7 @@ use Door\Core\Helper\Arr;
 class Response {
 
 	// HTTP status codes and messages
-	public static $messages = array(
+	protected $messages = array(
 		// Informational 1xx
 		100 => 'Continue',
 		101 => 'Switching Protocols',
@@ -76,9 +76,9 @@ class Response {
 	protected $status = 200;
 
 	/**
-	 * @var  array
+	 * @var Header
 	 */
-	protected $headers;
+	protected $header;
 
 	/**
 	 * @var  string      The response body
@@ -101,7 +101,7 @@ class Response {
 	 * @param   array $config Setup the response object
 	 * @return  void
 	 */
-	public function __construct($config)
+	public function __construct(array $config = array())
 	{
 		$this->header = new Header;
 
@@ -128,7 +128,7 @@ class Response {
 	 */
 	public function __toString()
 	{
-		return $this->_body;
+		return $this->body;
 	}
 
 	/**
@@ -139,9 +139,9 @@ class Response {
 	public function body($content = NULL)
 	{
 		if ($content === NULL)
-			return $this->_body;
+			return $this->body;
 
-		$this->_body = (string) $content;
+		$this->body = (string) $content;
 		return $this;
 	}
 
@@ -156,16 +156,16 @@ class Response {
 	{
 		if ($protocol)
 		{
-			$this->_protocol = strtoupper($protocol);
+			$this->protocol = strtoupper($protocol);
 			return $this;
 		}
 
-		if ($this->_protocol === NULL)
+		if ($this->protocol === NULL)
 		{
-			$this->_protocol = HTTP::$protocol;
+			$this->protocol = 'HTTP/1.1';
 		}
 
-		return $this->_protocol;
+		return $this->protocol;
 	}
 
 	/**
@@ -185,11 +185,11 @@ class Response {
 	{
 		if ($status === NULL)
 		{
-			return $this->_status;
+			return $this->status;
 		}
 		elseif (array_key_exists($status, $this->messages))
 		{
-			$this->_status = (int) $status;
+			$this->status = (int) $status;
 			return $this;
 		}
 		else
@@ -221,24 +221,24 @@ class Response {
 	 */
 	public function headers($key = NULL, $value = NULL)
 	{
-		if($value === null)
+		if ($key === NULL)
 		{
-			if(is_array($key))
-			{
-				foreach($key as $k => $value)
-				{
-					$this->headers($k, $value);
-				}
-				return $this;
-			}			
-			else
-			{
-				return Arr::get($this->headers, $key);
-			}
+			return $this->header;
 		}
-
-		$this->headers[$key] = $value;
-		return $this;
+		elseif (is_array($key))
+		{
+			$this->header->exchangeArray($key);
+			return $this;
+		}
+		elseif ($value === NULL)
+		{
+			return Arr::get($this->header, $key);
+		}
+		else
+		{
+			$this->header[$key] = $value;
+			return $this;
+		}
 	}
 
 	/**
@@ -261,7 +261,7 @@ class Response {
 	 */
 	public function send_headers($replace = FALSE, $callback = NULL)
 	{
-		return $this->_header->send_headers($this, $replace, $callback);
+		return $this->header->send_headers($this, $replace, $callback);
 	}
 
 	/**
@@ -308,7 +308,7 @@ class Response {
 		{
 			if (empty($download))
 			{
-				throw new Kohana_Exception('Download name must be provided for streaming files');
+				throw new Exception('Download name must be provided for streaming files');
 			}
 
 			// Temporary files will automatically be deleted
@@ -321,7 +321,7 @@ class Response {
 			}
 
 			// Force the data to be rendered if
-			$file_data = (string) $this->_body;
+			$file_data = (string) $this->body;
 
 			// Get the content size
 			$size = strlen($file_data);
@@ -361,7 +361,7 @@ class Response {
 
 		if ( ! is_resource($file))
 		{
-			throw new Kohana_Exception('Could not read file to send: :file', array(
+			throw new Exception('Could not read file to send: :file', array(
 				':file' => $download,
 			));
 		}
@@ -370,59 +370,39 @@ class Response {
 		$disposition = empty($options['inline']) ? 'attachment' : 'inline';
 
 		// Calculate byte range to download.
-		list($start, $end) = $this->_calculate_byte_range($size);
+		list($start, $end) = $this->calculate_byte_range($size);
 
 		if ( ! empty($options['resumable']))
 		{
 			if ($start > 0 OR $end < ($size - 1))
 			{
 				// Partial Content
-				$this->_status = 206;
+				$this->status = 206;
 			}
 
 			// Range of bytes being sent
-			$this->_header['content-range'] = 'bytes '.$start.'-'.$end.'/'.$size;
-			$this->_header['accept-ranges'] = 'bytes';
+			$this->header['content-range'] = 'bytes '.$start.'-'.$end.'/'.$size;
+			$this->header['accept-ranges'] = 'bytes';
 		}
 
 		// Set the headers for a download
-		$this->_header['content-disposition'] = $disposition.'; filename="'.$download.'"';
-		$this->_header['content-type']        = $mime;
-		$this->_header['content-length']      = (string) (($end - $start) + 1);
+		$this->header['content-disposition'] = $disposition.'; filename="'.$download.'"';
+		$this->header['content-type']        = $mime;
+		$this->header['content-length']      = (string) (($end - $start) + 1);
 
-		if (Request::user_agent('browser') === 'Internet Explorer')
-		{
-			// Naturally, IE does not act like a real browser...
-			if (Request::$initial->secure())
-			{
-				// http://support.microsoft.com/kb/316431
-				$this->_header['pragma'] = $this->_header['cache-control'] = 'public';
-			}
-
-			if (version_compare(Request::user_agent('version'), '8.0', '>='))
-			{
-				// http://ajaxian.com/archives/ie-8-security
-				$this->_header['x-content-type-options'] = 'nosniff';
-			}
-		}
-
+		
 		// Send all headers now
 		$this->send_headers();
-
+		
 		while (ob_get_level())
 		{
 			// Flush all output buffers
 			ob_end_flush();
 		}
 
+		
 		// Manually stop execution
 		ignore_user_abort(TRUE);
-
-		if ( ! Kohana::$safe_mode)
-		{
-			// Keep the script running forever
-			set_time_limit(0);
-		}
 
 		// Send data in 16kb blocks
 		$block = 1024 * 16;
@@ -490,10 +470,10 @@ class Response {
 	 */
 	public function render()
 	{
-		if ( ! $this->_header->offsetExists('content-type'))
+		if ( ! $this->header->offsetExists('content-type'))
 		{
 			// Add the default Content-Type header if required
-			$this->_header['content-type'] = Kohana::$content_type.'; charset='.Kohana::$charset;
+			$this->header['content-type'] = Kohana::$content_type.'; charset='.Kohana::$charset;
 		}
 
 		// Set the content length
@@ -506,31 +486,31 @@ class Response {
 		}
 
 		// Prepare cookies
-		if ($this->_cookies)
+		if ($this->cookies)
 		{
 			if (extension_loaded('http'))
 			{
-				$this->_header['set-cookie'] = http_build_cookie($this->_cookies);
+				$this->header['set-cookie'] = http_build_cookie($this->cookies);
 			}
 			else
 			{
 				$cookies = array();
 
 				// Parse each
-				foreach ($this->_cookies as $key => $value)
+				foreach ($this->cookies as $key => $value)
 				{
 					$string = $key.'='.$value['value'].'; expires='.date('l, d M Y H:i:s T', $value['expiration']);
 					$cookies[] = $string;
 				}
 
 				// Create the cookie string
-				$this->_header['set-cookie'] = $cookies;
+				$this->header['set-cookie'] = $cookies;
 			}
 		}
 
-		$output = $this->_protocol.' '.$this->_status.' '.$this->messages[$this->_status]."\r\n";
-		$output .= (string) $this->_header;
-		$output .= $this->_body;
+		$output = $this->protocol.' '.$this->status.' '.$this->messages[$this->status]."\r\n";
+		$output .= (string) $this->header;
+		$output .= $this->body;
 
 		return $output;
 	}
@@ -544,7 +524,7 @@ class Response {
 	 */
 	public function generate_etag()
 	{
-	    if ($this->_body === '')
+	    if ($this->body === '')
 		{
 			throw new Request_Exception('No response yet associated with request - cannot auto generate resource ETag');
 		}
@@ -560,7 +540,7 @@ class Response {
 	 * @link   http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35
 	 * @return array|FALSE
 	 */
-	protected function _parse_byte_range()
+	protected function parse_byte_range()
 	{
 		if ( ! isset($_SERVER['HTTP_RANGE']))
 		{
@@ -580,13 +560,13 @@ class Response {
 	 * @param  integer $size
 	 * @return array
 	 */
-	protected function _calculate_byte_range($size)
+	protected function calculate_byte_range($size)
 	{
 		// Defaults to start with when the HTTP_RANGE header doesn't exist.
 		$start = 0;
 		$end = $size - 1;
 
-		if ($range = $this->_parse_byte_range())
+		if ($range = $this->parse_byte_range())
 		{
 			// We have a byte range from HTTP_RANGE
 			$start = $range[1];
@@ -616,6 +596,55 @@ class Response {
 
 		return array($start, $end);
 	}
+	
+	public function message($status)
+	{
+		return Arr::get($this->messages, $status);
+	}
+	
+	/**
+	 * Set and get cookies values for this response.
+	 *
+	 *     // Get the cookies set to the response
+	 *     $cookies = $response->cookie();
+	 *
+	 *     // Set a cookie to the response
+	 *     $response->cookie('session', $value, 12352234);
+	 *
+	 * @param   mixed   $key    cookie name, or array of cookie values
+	 * @param   string  $value  value to set to cookie
+	 * @return  string
+	 * @return  void
+	 * @return  [Response]
+	 */
+	public function cookie($key = NULL, $value = NULL, $expiration = 0)
+	{
+		// Handle the get cookie calls
+		if ($key === NULL)
+			return $this->cookies;
+		elseif ( ! is_array($key) AND ! $value)
+			return Arr::get($this->cookies, $key);
+
+		// Handle the set cookie calls
+		if (is_array($key))
+		{
+			reset($key);
+			while (list($_key, $_value) = each($key))
+			{
+				$this->cookie($_key, $_value);
+			}
+		}
+		else
+		{
+			$this->cookies[$key] = array(
+				'value' => $value,
+				'expiration' => $expiration
+			);
+		}
+
+		return $this;
+	}
+	
 
 	
 	

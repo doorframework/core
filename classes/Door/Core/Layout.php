@@ -1,15 +1,18 @@
 <?php
 
-namespace Door\Core\Controller;
-use Door\Core\Controller;
+/*
+ * Created by Sachik Sergey
+ * box@serginho.ru
+ */
+
+namespace Door\Core;
 
 /**
- * Layout controller. Can be only one layout controller for request.
+ * Base class for layouts
  *
  * @author serginho
  */
-abstract class Layout extends Controller{
-	
+class Layout {
 	
 	protected $title = null;
 	protected $description = null;
@@ -57,13 +60,6 @@ abstract class Layout extends Controller{
 	 * @var View
 	 */
 	protected $layout = null;
-	
-	public function __construct(\Door\Core\Door $app, \Door\Core\Request $request, array $params = array()) {
-		parent::__construct($app, $request, $params);
-		
-		//$this->layout = $this->app->views->get()
-	}
-	
 	
 	public function before()
 	{
@@ -399,6 +395,6 @@ abstract class Layout extends Controller{
 		{
 			$this->keywords = $model->keywords;
 		}
-	}
+	}	
 	
 }

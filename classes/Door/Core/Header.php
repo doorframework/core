@@ -1,7 +1,8 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 namespace Door\Core;
 use ArrayObject;
+use \Door\Core\Helper\Text;
 
 /**
  * The Kohana_Header class provides an Object-Orientated interface
@@ -861,17 +862,17 @@ class Header extends ArrayObject {
 	 * @return  mixed
 	 * @since   3.2.0
 	 */
-	public function send_headers(HTTP_Response $response = NULL, $replace = FALSE, $callback = NULL)
+	public function send_headers(Response $response = NULL, $replace = FALSE, $callback = NULL)
 	{
 		$protocol = $response->protocol();
 		$status = $response->status();
 
 		// Create the response header
-		$processed_headers = array($protocol.' '.$status.' '.Response::$messages[$status]);
+		$processed_headers = array($protocol.' '.$status.' '.$response->message($status));
 
 		// Get the headers array
 		$headers = $response->headers()->getArrayCopy();
-
+		
 		foreach ($headers as $header => $value)
 		{
 			if (is_array($value))
@@ -884,12 +885,7 @@ class Header extends ArrayObject {
 
 		if ( ! isset($headers['content-type']))
 		{
-			$processed_headers[] = 'Content-Type: '.Kohana::$content_type.'; charset='.Kohana::$charset;
-		}
-
-		if (Kohana::$expose AND ! isset($headers['x-powered-by']))
-		{
-			$processed_headers[] = 'X-Powered-By: '.Kohana::version();
+			$processed_headers[] = 'Content-Type: text/html; charset=utf-8';
 		}
 
 		// Get the cookies and apply

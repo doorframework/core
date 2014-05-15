@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php 
+
+namespace Door\Core\Helper;
+
 /**
  * File helper class.
  *
@@ -8,7 +11,7 @@
  * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class Kohana_File {
+class File {
 
 	/**
 	 * Attempt to get the mime type from a file. This method is horribly

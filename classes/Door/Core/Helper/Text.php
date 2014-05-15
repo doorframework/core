@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+namespace Door\Core\Helper;
+
 /**
  * Text helper class. Provides simple methods for working with text.
  *
@@ -8,7 +11,7 @@
  * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class Kohana_Text {
+class Text {
 
 	/**
 	 * @var  array   number units and text equivalents
