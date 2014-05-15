@@ -17,7 +17,7 @@ abstract class Controller {
 	
 	/**
 	 *
-	 * @var Door
+	 * @var Application
 	 */
 	protected $app;
 	
@@ -28,12 +28,34 @@ abstract class Controller {
 	protected $response;
 	
 	/**
+	 * default params for controller
+	 * @var array
+	 */
+	protected $defaults = array();
+	
+	/**
 	 * @var array
 	 */
 	private $params = array();
 	
-	final public function __construct(Application $app, Request $request, array $params = array())
+	final public function __construct(Application $app, Request $request, array $params = array(), array $config = array())
 	{
+		foreach($this->defaults as $key => $value)
+		{
+			if( !array_key_exists($key, $params))
+			{
+				$params[$key] = $value;
+			}
+		}
+		
+		foreach($config as $key => $value)
+		{
+			if(property_exists($this, $key))
+			{
+				$this->$key = $value;
+			}
+		}
+		
 		$this->request = $request;
 		$this->params = $params;
 		$this->app = $app;
@@ -64,4 +86,9 @@ abstract class Controller {
 	}
 	
 	public abstract function execute();	
+	
+	protected function redirect($uri)
+	{
+		$this->response->headers("Location", $this->app->url->site($uri));
+	}
 }

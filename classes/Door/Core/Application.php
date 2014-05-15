@@ -11,8 +11,9 @@ use Exception;
  * @author     Sachik Sergey
  * @license    MIT
  * 
- * @param \Door\Core\Library\Arr $arr
+ * @param \Door\Core\Library\Auth $auth
  * @param \Door\Core\Library\Database $database
+ * @param \Door\Core\Library\Cookie $cookie
  * @param \Door\Core\Library\Events $events
  * @param \Door\Core\Library\HTML $html
  * @param \Door\Core\Library\Image $image
@@ -20,6 +21,7 @@ use Exception;
  * @param \Door\Core\Library\Media $media
  * @param \Door\Core\Library\Models $models
  * @param \Door\Core\Library\Router $router
+ * @param \Door\Core\Library\Session $session 
  * @param \Door\Core\Library\URL $url
  * @param \Door\Core\Library\Views $views
  */
@@ -58,6 +60,8 @@ class Application {
 	 * @var Request
 	 */
 	private $initial_request = null;
+	
+	private $initialized = false;
 
 	
 	/**
@@ -144,7 +148,21 @@ class Application {
 	 */
 	public function request($uri)
 	{				
+		if( ! $this->initialized)
+		{
+			$this->initialize();
+		}
+		
 		return new Request(trim($uri, "/"), $this);
+	}
+	
+	public function initialize()
+	{
+		foreach($this->libraries as $library)
+		{
+			$library->init();
+		}
+		$this->initialized = true;
 	}
 	
 	public function charset()

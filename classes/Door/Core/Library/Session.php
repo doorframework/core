@@ -1,4 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
+
+namespace Door\Core\Library;
+
 /**
  * Base session class.
  *
@@ -8,121 +11,30 @@
  * @copyright  (c) 2008-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-abstract class Kohana_Session {
+class Session extends \Door\Core\Library {
 
-	/**
-	 * @var  string  default session adapter
-	 */
-	public static $default = 'native';
-
-	/**
-	 * @var  array  session instances
-	 */
-	public static $instances = array();
-
-	/**
-	 * Creates a singleton session of the given type. Some session types
-	 * (native, database) also support restarting a session by passing a
-	 * session id as the second parameter.
-	 *
-	 *     $session = Session::instance();
-	 *
-	 * [!!] [Session::write] will automatically be called when the request ends.
-	 *
-	 * @param   string  $type   type of session (native, cookie, etc)
-	 * @param   string  $id     session identifier
-	 * @return  Session
-	 * @uses    Kohana::$config
-	 */
-	public static function instance($type = NULL, $id = NULL)
-	{
-		if ($type === NULL)
-		{
-			// Use the default type
-			$type = Session::$default;
-		}
-
-		if ( ! isset(Session::$instances[$type]))
-		{
-			// Load the configuration for this type
-			$config = Kohana::$config->load('session')->get($type);
-
-			// Set the session class name
-			$class = 'Session_'.ucfirst($type);
-
-			// Create a new session instance
-			Session::$instances[$type] = $session = new $class($config, $id);
-
-			// Write the session at shutdown
-			register_shutdown_function(array($session, 'write'));
-		}
-
-		return Session::$instances[$type];
-	}
-
-	/**
-	 * @var  string  cookie name
-	 */
-	protected $_name = 'session';
 
 	/**
 	 * @var  int  cookie lifetime
 	 */
-	protected $_lifetime = 0;
-
-	/**
-	 * @var  bool  encrypt session data?
-	 */
-	protected $_encrypted = FALSE;
+	public $lifetime = 0;
 
 	/**
 	 * @var  array  session data
 	 */
-	protected $_data = array();
+	public $data = array();
 
 	/**
 	 * @var  bool  session destroyed?
 	 */
-	protected $_destroyed = FALSE;
+	public $destroyed = FALSE;
 
-	/**
-	 * Overloads the name, lifetime, and encrypted session settings.
-	 *
-	 * [!!] Sessions can only be created using the [Session::instance] method.
-	 *
-	 * @param   array   $config configuration
-	 * @param   string  $id     session id
-	 * @return  void
-	 * @uses    Session::read
-	 */
-	public function __construct(array $config = NULL, $id = NULL)
-	{
-		if (isset($config['name']))
-		{
-			// Cookie name to store the session id in
-			$this->_name = (string) $config['name'];
-		}
-
-		if (isset($config['lifetime']))
-		{
-			// Cookie lifetime
-			$this->_lifetime = (int) $config['lifetime'];
-		}
-
-		if (isset($config['encrypted']))
-		{
-			if ($config['encrypted'] === TRUE)
-			{
-				// Use the default Encrypt instance
-				$config['encrypted'] = 'default';
-			}
-
-			// Enable or disable encryption of data
-			$this->_encrypted = $config['encrypted'];
-		}
-
-		// Load the session
+	public function init() {
+		
+		
 		$this->read($id);
+		
+		parent::init();
 	}
 
 	/**
@@ -138,18 +50,9 @@ abstract class Kohana_Session {
 	public function __toString()
 	{
 		// Serialize the data array
-		$data = $this->_serialize($this->_data);
+		$data = $this->serialize($this->_data);
 
-		if ($this->_encrypted)
-		{
-			// Encrypt the data using the default key
-			$data = Encrypt::instance($this->_encrypted)->encode($data);
-		}
-		else
-		{
-			// Encode the data
-			$data = $this->_encode($data);
-		}
+		$data = $this->encode($data);
 
 		return $data;
 	}
@@ -169,21 +72,6 @@ abstract class Kohana_Session {
 	public function & as_array()
 	{
 		return $this->_data;
-	}
-
-	/**
-	 * Get the current session id, if the session supports it.
-	 *
-	 *     $id = $session->id();
-	 *
-	 * [!!] Not all session types have ids.
-	 *
-	 * @return  string
-	 * @since   3.0.8
-	 */
-	public function id()
-	{
-		return NULL;
 	}
 
 	/**
@@ -299,16 +187,7 @@ abstract class Kohana_Session {
 		{
 			if (is_string($data = $this->_read($id)))
 			{
-				if ($this->_encrypted)
-				{
-					// Decrypt the data using the default key
-					$data = Encrypt::instance($this->_encrypted)->decode($data);
-				}
-				else
-				{
-					// Decode the data
-					$data = $this->_decode($data);
-				}
+				$data = $this->_decode($data);
 
 				// Unserialize the data
 				$data = $this->_unserialize($data);
@@ -467,39 +346,98 @@ abstract class Kohana_Session {
 	}
 
 	/**
-	 * Loads the raw session data string and returns it.
-	 *
-	 * @param   string  $id session id
 	 * @return  string
 	 */
-	abstract protected function _read($id = NULL);
+	public function id()
+	{
+		return session_id();
+	}
 
 	/**
-	 * Generate a new session id and return it.
-	 *
+	 * @param   string  $id  session id
+	 * @return  null
+	 */
+	protected function _read($id = NULL)
+	{		
+		// Sync up the session cookie with Cookie parameters
+		session_set_cookie_params($this->lifetime, Cookie::$path, Cookie::$domain, Cookie::$secure, Cookie::$httponly);
+
+		// Do not allow PHP to send Cache-Control headers
+		session_cache_limiter(FALSE);
+
+		// Set the session cookie name
+		session_name($this->_name);
+
+		if ($id)
+		{
+			// Set the session id
+			session_id($id);
+		}
+
+		// Start the session
+		session_start();
+
+		// Use the $_SESSION global for storing data
+		$this->_data =& $_SESSION;
+
+		return NULL;
+	}
+
+	/**
 	 * @return  string
 	 */
-	abstract protected function _regenerate();
+	protected function _regenerate()
+	{
+		// Regenerate the session id
+		session_regenerate_id();
+
+		return session_id();
+	}
 
 	/**
-	 * Writes the current session.
-	 *
-	 * @return  boolean
+	 * @return  bool
 	 */
-	abstract protected function _write();
+	protected function _write()
+	{
+		// Write and close the session
+		session_write_close();
+
+		return TRUE;
+	}
 
 	/**
-	 * Destroys the current session.
-	 *
-	 * @return  boolean
+	 * @return  bool
 	 */
-	abstract protected function _destroy();
+	protected function _restart()
+	{
+		// Fire up a new session
+		$status = session_start();
+
+		// Use the $_SESSION global for storing data
+		$this->_data =& $_SESSION;
+
+		return $status;
+	}
 
 	/**
-	 * Restarts the current session.
-	 *
-	 * @return  boolean
+	 * @return  bool
 	 */
-	abstract protected function _restart();
+	protected function _destroy()
+	{
+		// Destroy the current session
+		session_destroy();
+
+		// Did destruction work?
+		$status = ! session_id();
+
+		if ($status)
+		{
+			// Make sure the session cannot be restarted
+			Cookie::delete($this->_name);
+		}
+
+		return $status;
+	}
+
 
 }

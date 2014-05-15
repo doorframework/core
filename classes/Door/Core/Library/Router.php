@@ -79,8 +79,9 @@ class Router extends \Door\Core\Library {
 			$params = $route->matches($request);
 			if($params !== false)			
 			{
+				$controller_config = $route->controller_config();
 				$controller_class = $route->controller();
-				return new $controller_class($this->app, $request, $params);
+				return new $controller_class($this->app, $request, $params, $controller_config);
 			}
 		}
 		

@@ -43,6 +43,8 @@ class Route {
 	protected $compiled_regex = null;
 	
 	protected $defaults = array();
+	
+	protected $controller_config = array();
 
 	public function __construct($uri, $controller_class, array $regex = array())
 	{
@@ -135,6 +137,18 @@ class Route {
 		{
 			$this->defaults[$key] = $value;
 		}
+	}
+	
+	public function controller_config(array $params = null)
+	{
+		if($params === null)
+		{
+			return $this->controller_config;
+		}
+		else
+		{
+			$this->controller_config = $params;
+		}		
 	}
 	
 	/**
