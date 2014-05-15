@@ -32,27 +32,21 @@ abstract class Controller {
 	 */
 	private $params = array();
 	
-	/**
-	 * @var Layout
-	 */
-	protected $layout = null;
-	
-	/**
-	 * @var string
-	 */
-	protected $layout_name = null;
-	
-	public function __construct(Door $app, Request $request, array $params = array())
+	final public function __construct(Door $app, Request $request, array $params = array())
 	{
 		$this->request = $request;
 		$this->params = $params;
 		$this->app = $app;
 		$this->response = $request->response();
+		$this->init();
+	}
+	
+	/**
+	 * Override to add your initialization
+	 */
+	protected function init()
+	{
 		
-		if($this->layout_name !== false)
-		{
-			//$this->layout = $app->lay
-		}
 	}
 	
 	/**

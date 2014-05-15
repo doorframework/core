@@ -2,6 +2,7 @@
 
 namespace Door\Core\Controller;
 use Door\Core\Controller;
+use Door\Core\View;
 
 /**
  * Layout controller. Can be only one layout controller for request.
@@ -58,41 +59,24 @@ abstract class Layout extends Controller{
 	 */
 	protected $layout = null;
 	
-	public function __construct(\Door\Core\Door $app, \Door\Core\Request $request, array $params = array()) {
-		parent::__construct($app, $request, $params);
+	public function init(){
 		
-		//$this->layout = $this->app->views->get()
-	}
-	
-	
-	public function before()
-	{
-		$this->layout = View::factory($this->layout_name);
-		parent::before();
-
-		
-		$data = array(
-			'layout' => $this
-		);
-		Event::run("Controller_Layout.before", $data);		
-	}
-	
-	
-	public function after()
-	{
 		if($this->show_layout)
 		{
+			$this->layout = $this->app->views->get($this->layout_name);
+		}
+		
+		parent::init();
+	}
+	
+	public function execute() {		
+		if($this->show_layout)
+		{			
 			$this->layout->content = $this->response->body();
 			$this->layout->headers = $this->render_headers();
 			$this->response->body($this->layout);
-		}
-		parent::after();
-		
-		$data = array(
-			'layout' => $this
-		);
-		Event::run("Controller_Layout.after", $data);		
-	}
+		}				
+	}		
 	
 	protected function render_headers()
 	{

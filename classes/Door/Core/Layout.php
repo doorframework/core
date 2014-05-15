@@ -18,7 +18,7 @@ class Layout {
 	protected $description = null;
 	protected $keywords = null;
 	
-	public static $compile_scripts = false;
+	protected $compile_scripts = false;
 	
     const JS_EXT = "js";
     const CSS_EXT = "css";		
@@ -396,5 +396,7 @@ class Layout {
 			$this->keywords = $model->keywords;
 		}
 	}	
+	
+	
 	
 }
