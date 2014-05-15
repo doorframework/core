@@ -10,7 +10,7 @@ namespace Door\Core\Controller;
  *
  * @author serginho
  */
-class Redirect extends Door\Core\Controller {
+class Redirect extends \Door\Core\Controller {
 	
 	protected $redirect_uri = "";
 	
