@@ -7,7 +7,7 @@
 
 namespace Door\Core\Library;
 use \Door\Core\Model as Model;
-use \Exeption;
+use \Exception;
 
 /**
  * Description of Models
