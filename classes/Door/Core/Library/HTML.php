@@ -70,7 +70,7 @@ class HTML extends \Door\Core\Library{
 	 */
 	public function chars($value, $double_encode = TRUE)
 	{
-		return htmlspecialchars( (string) $value, ENT_QUOTES, Kohana::$charset, $double_encode);
+		return htmlspecialchars( (string) $value, ENT_QUOTES, $this->app->charset(), $double_encode);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class HTML extends \Door\Core\Library{
 	 */
 	public function entities($value, $double_encode = TRUE)
 	{
-		return htmlentities( (string) $value, ENT_QUOTES, Kohana::$charset, $double_encode);
+		return htmlentities( (string) $value, ENT_QUOTES, $this->app->charset(), $double_encode);
 	}
 
 	/**

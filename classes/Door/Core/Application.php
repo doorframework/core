@@ -32,7 +32,7 @@ class Application {
 	const PRODUCTION  = 10;
 	const STAGING     = 20;
 	const TESTING     = 30;
-	const DEVELOPMENT = 40;
+	const DEVELOPMENT = 40;		
 
 	/**
 	 * @var string 
@@ -50,6 +50,8 @@ class Application {
 	 * @var array
 	 */
 	private $libraries = array();
+	
+	protected $charset = 'utf-8';
 
 	
 	/**
@@ -113,6 +115,11 @@ class Application {
 	public function request($uri)
 	{				
 		return new Request(trim($uri, "/"), $this);
+	}
+	
+	public function charset()
+	{
+		return $this->charset;
 	}
 	
 	
