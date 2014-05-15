@@ -252,7 +252,7 @@ class Media extends \Door\Core\Library {
 		foreach($this->paths as $path_config)
 		{
 			$prefix = $path_config['prefix'];
-			if($prefix == "" || strpos($name, $prefix) === 0) 
+			if($prefix == "" || strpos($file, $prefix) === 0) 
 			{
 				$success_paths[] = $path_config;
 			}
