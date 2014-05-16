@@ -4,6 +4,7 @@ namespace Door\Core;
 use \MongoCollection;
 use \MongoDB;
 use \MongoDate;
+use \MongoId;
 
 /**
  * Description of Model
