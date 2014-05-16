@@ -5,8 +5,9 @@
  * box@serginho.ru
  */
 namespace Door\Core\Library;
-use \MongoDB;
-use \MongoClient;
+use MongoDB;
+use MongoClient;
+use Door\Core\Helper\Arr;
 /**
  * Description of Database
  *
