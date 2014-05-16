@@ -3,6 +3,7 @@
 namespace Door\Core;
 use \MongoCollection;
 use \MongoDB;
+use \MongoDate;
 
 /**
  * Description of Model
