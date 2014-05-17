@@ -62,6 +62,20 @@ class Application {
 	private $initial_request = null;
 	
 	private $initialized = false;
+	
+	protected $core_libraries = array(
+		"router" => '/Door/Core/Library/Router',
+		"views" => '/Door/Core/Library/Views',
+		"media" => '/Door/Core/Library/Media',
+		"html" => '/Door/Core/Library/HTML',
+		"url" => '/Door/Core/Library/URL',
+		"auth" => '/Door/Core/Library/Auth',
+		"session" => '/Door/Core/Library/Session',
+		"cookie" => '/Door/Core/Library/Cookie',
+		"database" => '/Door/Core/Library/Database',
+		"models" => '/Door/Core/Library/Models',
+		"lang" => '/Door/Core/Library/Lang'
+	);
 
 	
 	/**
@@ -131,14 +145,18 @@ class Application {
 	 * 
 	 * @return Request
 	 */
-	public function initial_request()
+	public function initial_request($uri = null)
 	{
-		if( $this->initial_request !== null)
+		if( $this->initial_request === null)
 		{
-			return $this->initial_request;
+			if($uri === null)
+			{
+				$uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "";
+			}
+			$this->initial_request = $this->request($uri);
 		}
-		$uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "";
-		return $this->request($uri);
+		
+		return $this->initial_request;
 	}	
 	
 	/**
@@ -168,6 +186,18 @@ class Application {
 	public function charset()
 	{
 		return $this->charset;
+	}
+	
+	public function register_core_libraries()
+	{
+		
+		foreach($this->core_libraries as $library => $class_name)
+		{
+			if( ! $this->library_exists($library))
+			{
+				$this->register_library($library, $class_name);
+			}
+		}
 	}
 	
 	

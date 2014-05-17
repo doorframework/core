@@ -6,6 +6,7 @@
  */
 
 namespace Door\Core\Model;
+use Door\Core\Valid;
 
 /**
  * Description of User

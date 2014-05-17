@@ -50,13 +50,8 @@ class UTF8 {
 	 * @uses    UTF8::strip_ascii_ctrl
 	 * @uses    UTF8::is_ascii
 	 */
-	public static function clean($var, $charset = NULL)
+	public static function clean($var, $charset = 'utf-8')
 	{
-		if ( ! $charset)
-		{
-			// Use the application character set
-			$charset = Kohana::$charset;
-		}
 
 		if (is_array($var) OR is_object($var))
 		{
@@ -143,13 +138,6 @@ class UTF8 {
 	 */
 	public static function transliterate_to_ascii($str, $case = 0)
 	{
-		if ( ! isset(UTF8::$called[__FUNCTION__]))
-		{
-			require Kohana::find_file('utf8', __FUNCTION__);
-
-			// Function has been called
-			UTF8::$called[__FUNCTION__] = TRUE;
-		}
 
 		return _transliterate_to_ascii($str, $case);
 	}
@@ -168,15 +156,7 @@ class UTF8 {
 	public static function strlen($str)
 	{
 		if (UTF8::$server_utf8)
-			return mb_strlen($str, Kohana::$charset);
-
-		if ( ! isset(UTF8::$called[__FUNCTION__]))
-		{
-			require Kohana::find_file('utf8', __FUNCTION__);
-
-			// Function has been called
-			UTF8::$called[__FUNCTION__] = TRUE;
-		}
+			return mb_strlen($str, 'utf-8');
 
 		return _strlen($str);
 	}

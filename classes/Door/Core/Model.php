@@ -5,6 +5,7 @@ use \MongoCollection;
 use \MongoDB;
 use \MongoDate;
 use \MongoId;
+use \Exception;
 
 /**
  * Description of Model
@@ -507,29 +508,50 @@ abstract class Model{
 	
 	public function save()
 	{		
-		if( ! isset($this->_object['_id']))
+		if(isset($this->_id))
 		{
-			if(isset($this->_created_column)){
-				$this->set($this->_created_column, time());
-			}			
-			
-			$this->_object['_id'] = new MongoId();
+			$this->update();
+		}
+		else
+		{
+			$this->create();
+		}
+
+	}
+	
+	public function update()
+	{
+		if( ! $this->check())
+		{
+			throw new Exception("Validation failed");
 		}
 		
 		if(isset($this->_updated_column)){
 			$this->set($this->_updated_column, time());
-		}			
+		}					
 		
 		$this->get_collection()->update(
 			array("_id" => $this->_object['_id']),
 			$this->_object,
 			array("upsert" => true)				
-		);
+		);		
 	}
 	
 	public function create()
 	{
-		$this->save();
+		if( ! $this->check()){
+			throw new Exception("Validation failed");
+		}
+		
+		if(isset($this->_created_column)){
+			$this->set($this->_created_column, time());
+		}				
+		
+		if(isset($this->_updated_column)){
+			$this->set($this->_updated_column, time());
+		}				
+		
+		$this->get_collection()->insert($this->_object);		
 	}
 	
 	public function has($alias, $far_key)
@@ -539,7 +561,7 @@ abstract class Model{
 	
 	/**
 	 * 
-	 * @return Validation
+	 * @return \Door\Core\Validation
 	 */
 	public function validation()
 	{
@@ -556,8 +578,7 @@ abstract class Model{
 	 * Validates the current model's data
 	 *
 	 * @param  Validation $extra_validation Validation object
-	 * @throws ORM_Validation_Exception
-	 * @return ORM
+	 * @return bool
 	 */
 	public function check(Validation $extra_validation = NULL)
 	{
@@ -569,19 +590,12 @@ abstract class Model{
 
 		$array = $this->_validation;
 
-		if (($this->_valid = $array->check()) === FALSE OR $extra_errors)
+		if($array->check() === FALSE OR $extra_errors)
 		{
-			$exception = new Door_Validation_Exception($this->errors_filename(), $array);
-
-			if ($extra_errors)
-			{
-				// Merge any possible errors from the external object
-				$exception->add_object('_external', $extra_validation);
-			}
-			throw $exception;
+			return false;
 		}
 
-		return $this;
+		return true;
 	}	
 	
 	/**
@@ -657,10 +671,10 @@ abstract class Model{
 	{
 		$key1 = "{$this->_model_name}.{$field}";
 
-		$val = I18n::get($key1);
+		$val = $this->app()->lang->get($key1);
 		
 		if($val == $key1){
-			$val = I18n::get($field);
+			$val = $this->app()->lang->get($field);
 		}
 
 		return $val;
