@@ -22,6 +22,12 @@ class Router extends \Door\Core\Library {
 	 */
 	protected $routes = array();
 	
+	/**
+	 *
+	 * @var array
+	 */
+	protected $contoller_aliases = array();
+	
 	
 	/**
 	 * Stores a named route and returns it. The "action" will always be set to
@@ -34,12 +40,18 @@ class Router extends \Door\Core\Library {
 	 *
 	 * @param   string  $name           route name
 	 * @param   string  $uri            URI pattern
+	 * @param   string  $controller     Controller class name or alias
 	 * @param   array   $regex          regex patterns for route keys
 	 * @return  Route
 	 */	
-	public function add($name, $uri, $controller_class, array $regex = array()){
+	public function add($name, $uri, $controller, array $regex = array()){
 		
-		return $this->routes[$name] = new Route($uri, $controller_class, $regex);
+		if(isset($this->contoller_aliases[$controller]))
+		{
+			$controller = $this->contoller_aliases[$controller];
+		}
+		
+		return $this->routes[$name] = new Route($uri, $controller, $regex);
 		
 	}	
 	
@@ -86,6 +98,11 @@ class Router extends \Door\Core\Library {
 		}
 		
 		return null;
+	}
+	
+	public function controller_alias($alias, $class_name)
+	{
+		$this->contoller_aliases[$alias] = $class_name;
 	}
 	
 	

@@ -194,6 +194,16 @@ abstract class Model{
 		
 		
 	}
+		
+	public function mark_dirty($column)
+	{
+		if( ! isset($this->_fields[$column]))
+		{
+			throw new Exception("field $column not found");
+		}
+		
+		$this->_changed[$column] = $column;		
+	}
 	
 	public function __isset($column) {
 		
@@ -554,9 +564,13 @@ abstract class Model{
 		
 		if(isset($this->_updated_column)){
 			$this->set($this->_updated_column, time());
-		}				
+		}		
+		
+		$this->_object['_id'] = new MongoId;
+		
 		
 		$this->get_collection()->insert($this->_object);		
+		
 	}
 	
 	public function has($alias, $far_key)
