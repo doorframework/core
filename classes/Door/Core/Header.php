@@ -920,7 +920,7 @@ class Header extends ArrayObject {
 		// If the headers have been sent, get out
 		if (headers_sent())
 			return $this;
-
+		
 		foreach ($headers as $key => $line)
 		{
 			if ($key == 'Set-Cookie' AND is_array($line))

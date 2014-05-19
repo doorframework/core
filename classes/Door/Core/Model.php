@@ -1,6 +1,8 @@
 <?php
 
 namespace Door\Core;
+use \Door\Core\Database\Relation;
+use \Door\Core\Helper\Arr;
 use \MongoCollection;
 use \MongoDB;
 use \MongoDate;
@@ -174,14 +176,14 @@ abstract class Model{
 			
 			$relation = $this->_relations[$column];
 			switch($relation['type']){
-				case Door_Database_Relation::MANY_TO_ONE:
+				case \Door\Core\Database\Relation::MANY_TO_ONE:
 					if( !($value instanceof Model)){
 						throw new Exception("can`t set this argument");
 					}					
 					$this->{$this->relation['field']} = $value->pk();									
 					break;
-				case Door_Database_Relation::ONE_TO_MANY:
-				case Door_Database_Relation::MANY_TO_MANY:
+				case \Door\Core\Database\Relation::ONE_TO_MANY:
+				case \Door\Core\Database\Relation::MANY_TO_MANY:
 				default:
 					throw new Exception('can`t set relation :relation', array($relation['type']));
 			}
@@ -223,6 +225,10 @@ abstract class Model{
 	 */	
 	public function get($column)
 	{
+		if($column == 'id')
+		{
+			$column = '_id';
+		}
 		
 		if(array_key_exists($column, $this->_fields))
 		{
@@ -259,13 +265,13 @@ abstract class Model{
 			
 			if($relation['type'] == 'many_to_many'){
 				
-				return new Door_Database_Relation(
+				return new Relation(
 						$this, 
 						$column);									
 				
 			} elseif($relation['type'] == 'one_to_many') { 
 				
-				$return_value = Model::factory($relation['model']);
+				$return_value = $this->app()->models->factory($relation['model']);
 				$return_value->where($foreign_relation['field'], $this->pk());
 				return $return_value;
 				
@@ -274,16 +280,12 @@ abstract class Model{
 				$id = $this->get($relation['field']);
 				if( $id === null) return null;
 				
-				return Model::factory($relation['model'])->find($id);
+				return $this->app()->models->factory($relation['model'])->find($id);
 				
 			}
 		}
 		
-		throw new Kohana_Exception("column :column not found in model :model", 
-				array(
-					":column" => $column, 
-					":model" => $this->_model_name
-				));
+		throw new Exception("column $column not found in model $this->_model_name");
 	}
 	
 	/**
@@ -307,7 +309,7 @@ abstract class Model{
 		}
 		
 		if(! isset(self::$_init_cache[$model_name])){
-			Model::factory($model_name);
+			$this->app()->models->factory($model_name);
 		}
 		
 		self::$_init_cache[$model_name]['_fields'];
@@ -320,7 +322,7 @@ abstract class Model{
 		}
 		
 		if(! isset(self::$_init_cache[$model_name])){
-			Model::factory($model_name);
+			$this->app()->models->factory($model_name);
 		}
 		
 		self::$_init_cache[$model_name]['_relations'];
@@ -369,7 +371,7 @@ abstract class Model{
 	
 	public function pk()
 	{
-		return $this->app()->arr->get($this->_object, '_id');
+		return Arr::get($this->_object, '_id');
 	}
 	
 	/**
@@ -439,14 +441,17 @@ abstract class Model{
 	
 	/**
 	 * 
-	 * @return \Door_Database_Cursor
+	 * @return \Door\Core\Database\Cursor
 	 */
 	public function find_all()
 	{
-		return new Door_Database_Cursor(
-				$this->_model_name, 
-				$this->db()->client, 
-				$this->db()->config['database'].".".$this->_collection, 
+		$db_instance_name = $this->app()->database->get_name($this->db());
+		$config = $this->app()->database->config($db_instance_name);
+		
+		return new \Door\Core\Database\Cursor(
+				$this, 
+				$this->app()->database->client($db_instance_name), 
+				$config['database'].".".$this->_collection, 
 				$this->_criteria, 
 				array_keys($this->_fields));
 	}
@@ -630,7 +635,7 @@ abstract class Model{
 	public function delete()
 	{
 		if(isset($this->_id)){			
-			$this->get_collection()->remove(array("_id" => $this->_id));						
+			$this->get_collection()->remove(array("_id" => $this->pk()));						
 		}
 		$this->reset();
 	}
@@ -650,13 +655,25 @@ abstract class Model{
 	 */
 	public function unique($field, $value)
 	{
-		return $this->get_collection()->count(array($field => $value)) == 0;
+		$criteria = array(
+			$field => $value,
+			'_id' => array(
+				'$ne' => $this->pk()
+			)				
+		);
+		
+		return $this->get_collection()->count($criteria) == 0;
 	}
 	
 	public function rules()
 	{
 		return $this->_rules;
 	}
+	
+	public function fields()
+	{
+		return $this->_fields;
+	}	
 	
 	public function labels()
 	{
@@ -668,7 +685,7 @@ abstract class Model{
 	}
 	
 	public function label($field)
-	{
+	{	
 		$key1 = "{$this->_model_name}.{$field}";
 
 		$val = $this->app()->lang->get($key1);

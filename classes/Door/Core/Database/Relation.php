@@ -5,13 +5,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
+namespace Door\Core\Database;
+use \Door\Core\Model;
+use \Exception;
+use \Door\Core\Helper\Arr;
 /**
  * Description of Relation
  * @package Door/Core
  * @author serginho
  */
-class Door_Database_Relation {
+class Relation {
 	
 	const ONE_TO_MANY = "one_to_many";
 	const MANY_TO_MANY = "many_to_many";
@@ -51,7 +54,7 @@ class Door_Database_Relation {
 		if(isset($this->relation1['foreignKey'])){
 			
 			$this->field2 = $this->relation1['foreignKey'];
-			$this->model2 = Model::factory($this->relation1['model']);
+			$this->model2 = $this->model1->app()->models->factory($this->relation1['model']);
 			$this->relation2 = Arr::get($this->model2->get_relations(), $this->field2);
 			
 		}
@@ -63,25 +66,17 @@ class Door_Database_Relation {
 	 */
 	public function find_all()
 	{
-		$return_value = Model::factory($this->relation1['model']);
+		$return_value = $this->model1->app()->models->factory($this->relation1['model']);
 		$return_value->where("_id",'in', $this->get_ids());
 		return $return_value;
 	}
 	
-	public function add($model)			
+	public function add(Model $model)			
 	{
-		$model_id = null;
-		if($model instanceof Model){
-			$model_id = $model->id;
-		} else {
-			$model_id = $model;
-			$model = Model::factory($this->relation1['model']);
-			$model->find($model_id);
-		}
 		
 		if($model->get_model_name() !== $this->relation1['model']){
 			
-			throw new Kohana_Exception("wrong model added");
+			throw new Exception("wrong model added");
 			
 		}
 		
@@ -141,13 +136,13 @@ class Door_Database_Relation {
 		if($model instanceof Model){
 			$model_id = $model->id;
 		} else {
-			$model = Model::factory($this->relation1['model']);
+			$model = $this->model1->app()->models->factory($this->relation1['model']);
 			$model->find($model_id);
 		}
 		
 		if($model->get_model_name() !== $this->relation1['model']){
 			
-			throw new Kohana_Exception("wrong model added");
+			throw new Exception("wrong model added");
 			
 		}
 		

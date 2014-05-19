@@ -37,6 +37,8 @@ class Bootstrap {
 				$app->register_library($library, $class_name);
 			}
 		}		
+		
+		register_shutdown_function(array($app->session, 'write'));
 	}
 	
 	

@@ -12,7 +12,7 @@ namespace Door\Core\Library;
  *
  * @author serginho
  */
-class Lang {
+class Lang extends \Door\Core\Library {
 	
 	/**
 	 * @var  string   target language: en-us, es-es, zh-cn, etc

@@ -4,25 +4,22 @@
  * Created by Sachik Sergey
  * box@serginho.ru
  */
-
+namespace Door\Core\Model;
 /**
  * Description of Role
  *
  * @author serginho
  */
-class Role {
+class Role extends \Door\Core\Model{
 	
 	protected function initialize()
-	{
-		$this->_fields += array(
-			"_id" => array(
-				"type" => "string"
-			)
-		);
-		
+	{	
 		parent::initialize();
 		
 		$this->_fields += array(
+			'name' => array(
+				'type' => 'string'
+			),	
 			'description' => array(
 				'type' => 'string'
 			),	

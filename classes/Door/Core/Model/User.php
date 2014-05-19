@@ -7,6 +7,7 @@
 
 namespace Door\Core\Model;
 use Door\Core\Valid;
+use \Exception;
 
 /**
  * Description of User
@@ -108,7 +109,7 @@ class User extends \Door\Core\Model{
 		
 		if($column == 'password'){
 			
-			$value = $this->app()->hash($value);
+			$value = $this->app()->auth->hash($value);
 		}
 		
 		parent::set($column, $value);
@@ -134,5 +135,17 @@ class User extends \Door\Core\Model{
 			$this->save();
 		}
 	}		
+	
+	public function has_role($role_name)
+	{
+		$role = $this->app()->models->factory('Role', array('name' => $role_name));
+		
+		if( ! $role->loaded())
+		{
+			throw new Exception("role {$role_name} not found");
+		}
+		
+		return $this->has('roles', $role);
+	}
 	
 }

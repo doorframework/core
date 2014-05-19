@@ -16,11 +16,18 @@ use Door\Core\Model;
  */
 class Cursor extends \MongoCursor {
 	
+	/**
+	 *
+	 * @var Model
+	 */
+	protected $model = null;
+	
 	protected $model_name = null;
 	
-	public function __construct($model_name, \MongoClient $connection, $ns, array $query = array(), array $fields = array()) {
+	public function __construct(Model $model, \MongoClient $connection, $ns, array $query = array(), array $fields = array()) {
 		
-		$this->model_name = $model_name;
+		$this->model_name = $model->get_model_name();
+		$this->model = $model;
 		parent::__construct($connection, $ns, $query, $fields);
 	}
 	
@@ -46,7 +53,7 @@ class Cursor extends \MongoCursor {
 	 */
 	protected function load_model($data)
 	{
-		$model = Model::factory($this->model_name);
+		$model = $this->model->app()->models->factory($this->model_name);
 		$model->from_array($data);
 		return $model;
 	}

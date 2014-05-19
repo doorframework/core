@@ -62,6 +62,8 @@ class Application {
 	private $initial_request = null;
 	
 	private $initialized = false;
+	
+	protected $docroot = null;
 
 	
 	/**
@@ -173,6 +175,25 @@ class Application {
 	{
 		return $this->charset;
 	}	
+	
+	public function docroot($docroot = null)
+	{
+		if($docroot !== null)
+		{
+			if($this->initialized)
+			{
+				throw new Exception("application already initialized");
+			}
+			$this->docroot = $docroot;
+		}
+		
+		if($this->docroot === null)
+		{
+			throw new Exception("you must specify docroot of your application");
+		}
+		
+		return $this->docroot;
+	}
 	
 	
 	

@@ -28,11 +28,13 @@ class Session extends \Door\Core\Library {
 	 * @var  bool  session destroyed?
 	 */
 	public $destroyed = FALSE;
+	
+	protected $_name = 'session';
 
 	public function init() {
 		
 		
-		$this->read($id);
+		$this->read();
 		
 		parent::init();
 	}
@@ -236,7 +238,7 @@ class Session extends \Door\Core\Library {
 	 */
 	public function write()
 	{
-		if (headers_sent() OR $this->_destroyed)
+		if (headers_sent() OR $this->destroyed)
 		{
 			// Session cannot be written when the headers are sent or when
 			// the session has been destroyed
@@ -246,17 +248,7 @@ class Session extends \Door\Core\Library {
 		// Set the last active timestamp
 		$this->data['last_active'] = time();
 
-		try
-		{
-			return $this->_write();
-		}
-		catch (Exception $e)
-		{
-			// Log & ignore all errors when a write fails
-			Kohana::$log->add(Log::ERROR, Kohana_Exception::text($e))->write();
-
-			return FALSE;
-		}
+		return $this->_write();
 	}
 
 	/**
@@ -359,8 +351,9 @@ class Session extends \Door\Core\Library {
 	 */
 	protected function _read($id = NULL)
 	{		
+		$c = $this->app->cookie;
 		// Sync up the session cookie with Cookie parameters
-		session_set_cookie_params($this->lifetime, Cookie::$path, Cookie::$domain, Cookie::$secure, Cookie::$httponly);
+		session_set_cookie_params($this->lifetime, $c->path, $c->domain, $c->secure, $c->httponly);
 
 		// Do not allow PHP to send Cache-Control headers
 		session_cache_limiter(FALSE);

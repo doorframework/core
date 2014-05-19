@@ -52,6 +52,18 @@ class Database extends \Door\Core\Library {
 		return $this->instances[$name];
 	}
 	
+	public function get_name(MongoDB $db)
+	{
+		foreach($this->instances as $name => $instance)
+		{
+			if($instance == $db)
+			{
+				return $name;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * get client
 	 * @param string $name
@@ -59,7 +71,7 @@ class Database extends \Door\Core\Library {
 	 */
 	public function client($name = 'default')
 	{
-		return $this->app->arr->get($this->clients, $name);
+		return Arr::get($this->clients, $name);
 	}
 	
 	/**
@@ -69,7 +81,7 @@ class Database extends \Door\Core\Library {
 	 */
 	public function config($name = 'default')
 	{
-		return $this->app->arr->get($this->configs, $name);
+		return Arr::get($this->configs, $name);
 	}
 	
 }

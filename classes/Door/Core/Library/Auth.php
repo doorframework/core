@@ -5,6 +5,7 @@
  * box@serginho.ru
  */
 namespace Door\Core\Library;
+use \Exception;
 /**
  * Description of Auth
  *
@@ -12,13 +13,19 @@ namespace Door\Core\Library;
  */
 class Auth extends \Door\Core\Library {
 	
-	public $session_key = 'session';
+	public $session_key = 'authuser';
 	
 	public $hash_key = null;
 	
 	public $hash_method = "md5";
 	
 	public $lifetime = 0;
+	
+	/**
+	 *
+	 * @var \Door\Core\Model\User;
+	 */
+	protected $user = null;
 
 	/**
 	 * Checks if a session is active.
@@ -44,7 +51,7 @@ class Auth extends \Door\Core\Library {
 			{
 				// Get all the roles
 				$roles = $this->app->models->factory('Role')
-							->where('_id', 'IN', $role)
+							->where('name', 'IN', $role)
 							->find_all()
 							->as_array(NULL, '_id');
 
@@ -57,7 +64,7 @@ class Auth extends \Door\Core\Library {
 				if ( ! is_object($role))
 				{
 					// Load the role
-					$this->app->models->factory('Role', $role);
+					$roles = $this->app->models->factory('Role', array('name' => $role));
 
 					if ( ! $roles->loaded())
 						return FALSE;
@@ -67,7 +74,7 @@ class Auth extends \Door\Core\Library {
 					$roles = $role;
 				}
 			}
-
+			
 			return $user->has('roles', $roles);
 		}
 	}
@@ -97,7 +104,7 @@ class Auth extends \Door\Core\Library {
 		}
 
 		// If the passwords match, perform a login
-		if ($user->has('roles', $this->app->models->factory('Role', 'login')) AND $user->password === $password)
+		if ($user->has('roles', $this->app->models->factory('Role', array("name" => 'login'))) AND $user->password === $password)
 		{
 			if ($remember === TRUE)
 			{
@@ -182,28 +189,39 @@ class Auth extends \Door\Core\Library {
 			}
 		}
 
-		return FALSE;
+		return null;
 	}
 
 	/**
 	 * Gets the currently logged in user from the session (with auto_login check).
 	 * Returns $default if no user is currently logged in.
 	 *
-	 * @param   mixed    $default to return in case user isn't logged in
-	 * @return  mixed
+	 * @return \Door\Core\Model\User
+	 * @return null
 	 */
-	public function get_user($default = NULL)
-	{
-		$user = $this->app->session->get($this->session_key, $default);
-
-		if ($user === $default)
+	public function get_user()
+	{		
+		if( $this->user === null)
 		{
-			// check for "remembered" login
-			if (($user = $this->auto_login()) === FALSE)
-				return $default;
+			$user_id = $this->app->session->get($this->session_key);
+			if ($user_id !== null)
+			{			
+				$user = $this->app->models->factory('User', $user_id);
+				if( ! $user->loaded())
+				{
+					throw new Exception("Authorized user not found");
+				}				
+				$this->user = $user;
+			} 
+			elseif (($user = $this->auto_login()) !== null) 
+			{
+				$this->user = $user;
+			}			
 		}
 
-		return $user;
+		
+
+		return $this->user;
 	}
 
 	/**
@@ -335,7 +353,7 @@ class Auth extends \Door\Core\Library {
 	{
 		if( ! isset($this->hash_key))
 		{
-			throw new Kohana_Exception('A valid hash key must be set in your auth.');
+			throw new Exception('A valid hash key must be set in your auth.');
 		}
 			
 
@@ -349,7 +367,7 @@ class Auth extends \Door\Core\Library {
 		$this->app->session->regenerate();
 
 		// Store username in session
-		$this->app->session->set($this->session_key, $user);
+		$this->app->session->set($this->session_key, (string)$user->pk());
 
 		return TRUE;
 	}
