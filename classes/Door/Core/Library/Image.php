@@ -6,6 +6,7 @@
  */
 namespace Door\Core\Library;
 use Door\Core\Model\Image as Model_Image;
+use Imagine\Gd\Imagine;
 
 /**
  * Library for Image manipulation
@@ -92,7 +93,9 @@ class Image extends \Door\Core\Library {
 			$model_image = $this->app->models->factory("Image");
 			$model_image->save();
 			
-			$image = Image::factory($filename);
+			$image = new Imagine;
+			$image->load($filename);
+
 			$new_image = $this->commit_converters($image, "default");
 			$this->save_image($new_image, 'default');	
 			
@@ -113,6 +116,11 @@ class Image extends \Door\Core\Library {
         }
 
         return $returnValue;		
+	}
+	
+	protected function commit_converters(Imagine $image, $presentation = "default")
+	{
+		
 	}
 	
 	protected function calculate_path($image_id, $extension, $presentation = 'default')

@@ -1,12 +1,15 @@
 <?php
 namespace Door\Core\Image\Converter;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\Point;
+use Imagine\Image\Box;
 
 /** 
  * Конвертер для пропорционального уменьшения или увеличения картинки до определенных
  * ширины и высоты.
  * @package Door/Core
  */
-class Fitbox extends Door_Image_Converter {
+class Fitbox extends \Door\Core\Image\Converter {
 	
 	/**
 	 * Ширина
@@ -42,27 +45,34 @@ class Fitbox extends Door_Image_Converter {
 	protected $strict = false;		
 	
 	public function convert() {
+				
 		
-		if($this->width == 0 && $this->height == 0)
+		if($this->width == 0 || $this->height == 0)
 		{
-			throw new Exception("Ширина и высота не заданы");
+			throw new Exception("Width and height not set in config");
 		}
-		if($this->width == 0) $this->width = 10000;
-		if($this->height == 0) $this->height = 10000;
 		
         if($this->strict)
-        {            
-            $this->image->resize($this->width, $this->height, Image::INVERSE);
-            $this->image->crop($this->width, $this->height);
+        {         
+			$size = new Box($this->width, $this->height);												
+			$this->image->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND);
+			
+			$image_size = $this->image->getSize();
+			$offset_x = round(($image_size->getWidth() - $this->width) / 2);
+			$offset_y = round(($image_size->getHeight() - $this->height) / 2);
+			
+			$point = new Point($offset_x, $offset_y);
+			$this->image->crop($point, $size);
         }		
 		else
 		{
 			$new_width = $this->width;
 			$new_height = $this->height;
-		
+								
 			if($this->max_scale != null)
 			{
-				$scale = max($new_width / $image->width, $new_height / $image->height);
+				$image_size = $this->image->getSize();
+				$scale = max($new_width / $image_size->getWidth(), $image_size->getHeight());
 				if($scale > $this->max_scale)
 				{
 					//Если увеличение больше максимального масштаба, то меняем
@@ -72,7 +82,8 @@ class Fitbox extends Door_Image_Converter {
 				}
 			}
 			
-			$this->image->resize($new_width, $new_height, Image::AUTO);
+			$box_size = new Box($new_width, $new_height);			
+			$this->image->resize($box_size);					
 		}	
 	}
 		

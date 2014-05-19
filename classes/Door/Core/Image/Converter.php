@@ -1,5 +1,6 @@
 <?php
 namespace Door\Core\Image;
+use Imagine\Gd\Image;
 
 /**
  * Базовый класс для всех конвертеров изображений
@@ -26,32 +27,14 @@ abstract class Converter {
 		
 	}
 	
+	/**
+	 * 
+	 * @return Image
+	 */
 	public function get_image()
 	{
 		return $this->image;
-	}
-	
-	/**
-	 *
-	 * @param string $class
-	 * @param Image $image
-	 * @param array $config 
-	 * @return Door_Image_Converter
-	 */
-	public static function factory($class, Image $image, array $config)
-	{
-		if(class_exists("Door_Image_Converter_".$class))
-		{
-			$class = "Door_Image_Converter_".$class;
-		}		
-		
-		if( ! class_exists($class))
-		{
-			throw new Exception("converter '$class' not founded");
-		}
-		
-		return new $class($image, $config);
-	}
+	}	
 	
 	public abstract function convert();
 
