@@ -23,6 +23,7 @@ class Bootstrap {
 		"auth" => '/Door/Core/Library/Auth',
 		"session" => '/Door/Core/Library/Session',
 		"cookie" => '/Door/Core/Library/Cookie',
+		"image" => '/Door/Core/Library/Image',
 		"database" => '/Door/Core/Library/Database',
 		"models" => '/Door/Core/Library/Models',
 		"lang" => '/Door/Core/Library/Lang'
