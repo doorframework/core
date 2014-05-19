@@ -234,12 +234,13 @@ class Media extends \Door\Core\Library {
 			'zip'      => array('application/x-zip', 'application/zip', 'application/x-zip-compressed')			
 		);	
 	
-	public function add($prefix, $path, $priority = 0)
+	public function add($prefix, $path, $prefix_in_path = true, $priority = 0)
 	{		
 		$this->paths[] = array(
 			'prefix' => trim($prefix, "/"),
 			'path' => rtrim($path, "/"),
-			'priority' => $priority
+			'priority' => $priority,
+			'prefix_in_path' => $prefix_in_path
 		);
 	}
 	
@@ -278,6 +279,11 @@ class Media extends \Door\Core\Library {
 		
 		foreach($success_paths as $path_config)
 		{
+			if($path_config['prefix_in_path'] == false)
+			{
+				$file = substr($file, strlen($path_config['prefix']) + 1);
+			}
+			
 			$path = $path_config['path'] . "/" . $file;
 			
 			if(file_exists($path))
