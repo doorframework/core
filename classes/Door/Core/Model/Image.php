@@ -34,9 +34,6 @@ class Image extends \Door\Core\Model {
 		parent::initialize();
 		
 		$this->_fields += array(
-			'mime' => array(
-				'type' => 'string'
-			),	
 			'extension' => array(
 				'type' => 'string'
 			),	

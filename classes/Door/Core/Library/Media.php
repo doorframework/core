@@ -311,4 +311,20 @@ class Media extends \Door\Core\Library {
 		return isset($this->mimes[$ext]) ? $this->mimes[$ext][0] : FALSE;
 	}
 	
+	public function ext_by_mime($mime)
+	{
+		if($mime == 'image/jpeg')
+		{
+			return "jpg";
+		}
+		foreach($this->mimes as $ext => $mimes)
+		{
+			if(array_search($mime, $mimes) !== false)
+			{
+				return $ext;
+			}
+		}
+		return null;
+	}
+	
 }
