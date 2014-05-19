@@ -106,7 +106,7 @@ class Image extends \Door\Core\Library {
 			}
 			
 			$imagine = new Imagine;
-			$image_gd = $imagine->load($default_file_path);
+			$image_gd = $imagine->open($default_file_path);
 			
 			$new_image_gd = $this->commit_converters($image_gd, $presentation);
 			
@@ -160,7 +160,7 @@ class Image extends \Door\Core\Library {
         }
 
 		$imagine = new Imagine;
-		$image = $imagine->load($filename);
+		$image = $imagine->open($filename);
 
 		$mime = $imagesize['mime'];
 		$extension = $this->app->media->ext_by_mime($mime);			
