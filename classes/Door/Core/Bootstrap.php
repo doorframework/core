@@ -29,7 +29,7 @@ class Bootstrap {
 		"lang" => '/Door/Core/Library/Lang'
 	);	
 	
-	public static function register_core_libraries(Application $app)
+	public static function register_core(Application $app)
 	{
 		foreach(self::$core_libraries as $library => $class_name)
 		{
@@ -40,6 +40,8 @@ class Bootstrap {
 		}		
 		
 		register_shutdown_function(array($app->session, 'write'));
+		
+		
 	}
 	
 	

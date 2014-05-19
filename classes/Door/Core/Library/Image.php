@@ -6,8 +6,8 @@
  */
 namespace Door\Core\Library;
 use Door\Core\Model\Image as Model_Image;
-use Imagine\Gd\Imagine;
 use Door\Core\Helper\Arr;
+use Imagine\Gd\Imagine;
 use Imagine\Gd\Image as Img;
 
 /**
@@ -41,6 +41,7 @@ class Image extends \Door\Core\Library {
 			{
 				$item['converter'] = $this->aliases[$item['converter']];
 			}
+			$item['converter'] = str_replace("/", "\\", $item['converter']);
 		}
 		
 		$this->converters[$name] = $converters;
@@ -63,12 +64,25 @@ class Image extends \Door\Core\Library {
 		));
 	}
 	
+	/**
+	 * 
+	 * @param type $image_id
+	 * @param type $presentation
+	 * @return string
+	 */
 	public function url($image_id, $presentation = 'default')
 	{
 		$data = $this->data($image_id, $presentation);
 		return $data['url'];
 	}
 	
+	/**
+	 * 
+	 * @param type $image_id
+	 * @param type $presentation
+	 * @return array
+	 * @throws Exception
+	 */
 	public function data($image_id, $presentation = 'default')
 	{
 		if($image_id == null)
@@ -86,8 +100,8 @@ class Image extends \Door\Core\Library {
 		if($presentation == 'default')
 		{
 			return array(
-				'url' => $this->calculate_url($image_id, $image->extension),
-				'path' => $this->calculate_path($image_id, $image->extension),
+				'url' => $this->calculate_url($image_id, $image->extension, $presentation),
+				'path' => $this->calculate_path($image_id, $image->extension, $presentation),
 				'width' => $image->width,
 				'height' => $image->height,
 				'title' => $image->title,
@@ -112,7 +126,7 @@ class Image extends \Door\Core\Library {
 			
 			$extension = Arr::get($this->configs[$presentation], 'extension', $image->extension);
 			
-			$path = $this->calculate_path($image_id, $extension);
+			$path = $this->calculate_path($image_id, $extension, $presentation);
 			
 			$dirname = dirname($path);
 			if( !file_exists($dirname))
@@ -128,12 +142,12 @@ class Image extends \Door\Core\Library {
 				'extension' => $extension
 			);
 			
-			$image->add_presentation($presentation_data);
+			$image->add_presentation($presentation, $presentation_data);
 		}		
 		
 		return array(
-			'url' => $this->calculate_url($image_id, $presentation_data['extension']),
-			'path' => $this->calculate_path($image_id, $presentation_data['extension']),
+			'url' => $this->calculate_url($image_id, $presentation_data['extension'], $presentation),
+			'path' => $this->calculate_path($image_id, $presentation_data['extension'], $presentation),
 			'width' => $presentation_data['width'],
 			'height' => $presentation_data['height'],
 			'title' => $image->title,
@@ -190,7 +204,7 @@ class Image extends \Door\Core\Library {
 	 * @param type $presentation
 	 * @return Img
 	 */
-	protected function commit_converters(Imagine $image, $presentation = "default")
+	protected function commit_converters(Img $image, $presentation = "default")
 	{
 		if( ! isset($this->converters[$presentation]))
 		{
@@ -222,7 +236,7 @@ class Image extends \Door\Core\Library {
 		$a1 = substr($image_id, 0, 2);
 		$a2 = substr($image_id, 2, 2);		
 		
-		return self::FOLDER."{$a1}/{$a2}/{$id}.{$presentation}.{$extension}";
+		return self::FOLDER."{$a1}/{$a2}/{$image_id}.{$presentation}.{$extension}";
 	}
 	
 	public function calculate_url($image_id, $extension, $presentation = 'default')

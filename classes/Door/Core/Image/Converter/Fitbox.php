@@ -54,25 +54,60 @@ class Fitbox extends \Door\Core\Image\Converter {
 		
         if($this->strict)
         {         
-			$size = new Box($this->width, $this->height);												
-			$this->image->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND);
+			$new_width = $this->width;
+			$new_height = $this->height;	
+			
+			$image_size = $this->image->getSize();
+			$image_width = $image_size->getWidth();
+			$image_height = $image_size->getHeight();
+			
+			$ratio = $image_width / $image_height;
+
+			if ($new_width / $new_height > $ratio)
+			{
+				$new_height = $image_height * $new_width / $image_width;
+			}
+			else
+			{
+				$new_width = $image_width * $new_height / $image_height;
+			}						
+			
+			
+			$size = new Box($new_width, $new_height);												
+			$this->image->resize($size);			
 			
 			$image_size = $this->image->getSize();
 			$offset_x = round(($image_size->getWidth() - $this->width) / 2);
 			$offset_y = round(($image_size->getHeight() - $this->height) / 2);
 			
 			$point = new Point($offset_x, $offset_y);
-			$this->image->crop($point, $size);
+			$this->image->crop($point, new Box($this->width, $this->height));
         }		
 		else
 		{
+			$image_size = $this->image->getSize();
+			$image_width = $image_size->getWidth();
+			$image_height = $image_size->getHeight();			
+			
 			$new_width = $this->width;
 			$new_height = $this->height;
+			
+			$ratio = $image_width / $image_height;
+
+			if ($new_width / $new_height > $ratio)
+			{
+				$new_width = $image_width * $new_height / $image_height;				
+			}
+			else
+			{
+				$new_height = $image_height * $new_width / $image_width;
+			}		
+			
 								
 			if($this->max_scale != null)
 			{
 				$image_size = $this->image->getSize();
-				$scale = max($new_width / $image_size->getWidth(), $image_size->getHeight());
+				$scale = max($new_width / $image_width, $image_height);
 				if($scale > $this->max_scale)
 				{
 					//Если увеличение больше максимального масштаба, то меняем
