@@ -17,8 +17,9 @@ class Needauth extends \Door\Core\Wrapper {
 	protected $redirect_uri = "profile/login";
 	
 	public function before() {
-		
-		if( ! $this->app->auth->logged_in($this->login_role))
+				
+		if( false == $this->app->auth->logged_in($this->login_role)
+			&& $this->redirect_uri != $this->request->uri())
 		{
 			$this->redirect($this->redirect_uri);
 		}

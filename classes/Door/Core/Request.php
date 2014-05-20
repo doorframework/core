@@ -73,7 +73,9 @@ class Request {
 	
 	public function execute()
 	{
-		list($controller, $wrappers) = $this->app->router->get_workers($this);				
+		$workers = $this->app->router->get_workers($this);
+		$controller = Arr::get($workers, 'controller');
+		$wrappers = Arr::get($workers, 'wrappers', array());
 		
 		if($controller != null)
 		{

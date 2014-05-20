@@ -47,6 +47,12 @@ class Router extends \Door\Core\Library {
 	 */
 	protected $wrapper_configs = array();
 	
+	/**
+	 *
+	 * @var array
+	 */
+	protected $wrappers = array();
+	
 	
 	/**
 	 * Stores a named route and returns it. The "action" will always be set to
@@ -122,10 +128,19 @@ class Router extends \Door\Core\Library {
 				$request->set_params($params);
 				$controller_config = $route->controller_config();
 				$controller_class = $route->controller();
-				$controller = $controller_class($this->app, $request, $controller_config);
+				$controller = new $controller_class($this->app, $request, $controller_config);
 				
 				$wrappers = array();
 				$wrappers_data = $route->wrappers();
+				
+				$uri = $request->uri();
+				foreach($this->wrappers as $wrapper_config)
+				{
+					if(strpos($uri, $wrapper_config['prefix']) === 0)
+					{
+						$wrappers_data[] = $wrapper_config;
+					}
+				}
 				
 				usort($wrappers_data, function($a, $b)
 				{
@@ -182,6 +197,8 @@ class Router extends \Door\Core\Library {
 			$wrapper = $this->wrapper_aliases[$wrapper];			
 		}
 		
+		$wrapper = str_replace("/", "\\", $wrapper);
+		
 		$this->wrapper_aliases[$alias] = $wrapper;
 		
 		$this->wrapper_configs[$alias] = $config;
@@ -204,6 +221,16 @@ class Router extends \Door\Core\Library {
 		}
 		
 		return new $wrapper($this->app, $request, $config);			
+	}
+	
+	public function wrap($prefix, $wrapper, $config = array(), $weight = 0)
+	{
+		$this->wrappers[] = array(
+			'prefix' => $prefix,
+			'wrapper' => $wrapper,
+			'config' => $config,
+			'weight' => $weight
+		);
 	}
 	
 	

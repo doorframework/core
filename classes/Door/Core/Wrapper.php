@@ -33,20 +33,8 @@ abstract class Wrapper {
 	 */
 	protected $defaults = array();
 	
-	/**
-	 * @var array
-	 */
-	private $params = array();
-	
-	final public function __construct(Application $app, Request $request, array $params = array(), array $config = array())
+	final public function __construct(Application $app, Request $request, array $config = array())
 	{
-		foreach($this->defaults as $key => $value)
-		{
-			if( !array_key_exists($key, $params))
-			{
-				$params[$key] = $value;
-			}
-		}
 		
 		foreach($config as $key => $value)
 		{
@@ -57,7 +45,6 @@ abstract class Wrapper {
 		}
 		
 		$this->request = $request;
-		$this->params = $params;
 		$this->app = $app;
 		$this->response = $request->response();
 		$this->init();

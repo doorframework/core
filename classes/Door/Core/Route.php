@@ -141,17 +141,28 @@ class Route {
 		}
 	}
 	
-	public function controller_config(array $params = null)
+	/**
+	 * 
+	 * @param array $params
+	 * @return array
+	 * @return \Door\Core\Route
+	 */
+	public function controller_config()
 	{
-		if($params === null)
-		{
-			return $this->controller_config;
-		}
-		else
-		{
-			$this->controller_config = $params + $this->controller_confign;
-		}		
+		return $this->controller_config;
 	}
+	
+	/**
+	 * 
+	 * @param array $params
+	 * @return \Door\Core\Route
+	 */
+	public function add_config(array $params)
+	{
+		$this->controller_config = $params + $this->controller_config;
+		return $this;
+	}
+			
 	
 	public function reset_config()
 	{

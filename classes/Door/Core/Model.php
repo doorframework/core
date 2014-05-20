@@ -194,7 +194,7 @@ abstract class Model{
 				case \Door\Core\Database\Relation::MANY_TO_MANY:
 					if( ! is_array($value))
 					{
-						$value = explode(",", $value);
+						$value = explode(",", trim($value," ,"));
 					}
 					$this->$column->from_array($value);										
 					break;
@@ -383,7 +383,7 @@ abstract class Model{
 		
 		foreach($values as $key => $value)
 		{
-			if(isset($this->_fields[$key]))
+			if(isset($this->_fields[$key]) || isset($this->_relations[$key]))
 			{
 				$this->$key = $value;
 			}

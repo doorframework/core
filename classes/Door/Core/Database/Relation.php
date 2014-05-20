@@ -75,7 +75,7 @@ class Relation {
 	{
 		if( !is_object($model))
 		{
-			$model = $this->model2->app()->models->factory($this->model2->get_model_name(), $model);
+			$model = $this->model1->app()->models->factory($this->relation1['model'], $model);
 		}		
 		
 		if($model->get_model_name() !== $this->relation1['model']){
@@ -133,7 +133,7 @@ class Relation {
 	
 	}
 	
-	public function remove($model_id)
+	public function remove($model)
 	{
 		
 		$model_id = null;
@@ -366,28 +366,38 @@ class Relation {
 	}
 	
 	public function from_array(array $ids)
-	{
+	{		
 		$old_ids = $this->get_ids();
 		$remove_ids = array_diff($old_ids, $ids);
 		$add_ids = array_diff($ids, $old_ids);
 		
 		foreach($remove_ids as $remove_id)
 		{
-			$this->remove($remove_id);
+			if($this->good_id($remove_id))
+			{
+				$this->remove($remove_id);
+			}
+			
 		}
 		
 		foreach($add_ids as $add_id)
 		{
-			$this->add($id);
+			if($this->good_id($add_id))
+			{
+				$this->add($add_id);
+			}						
 		}
 		
 		$new_ids = array();
 		foreach($ids as $id)
 		{
-			if( ! ($id instanceof \MongoId)){
-				$id = new \MongoId($id);
+			if($this->good_id($id))
+			{
+				if( ! ($id instanceof \MongoId)){
+					$id = new \MongoId($id);
+				}
+				$new_ids[] = $id;
 			}
-			$new_ids[] = $id;
 		}		
 		
 		if(isset($this->relation1['field'])){
@@ -490,6 +500,11 @@ class Relation {
 		}
 				
 		return $return_value;
+	}
+	
+	protected function good_id($id)
+	{
+		return ($id instanceof \MongoId) || strlen($id) == 24;
 	}
 	
 }
