@@ -133,7 +133,10 @@ class URL extends \Door\Core\Library {
 		{
 			return $uri;
 		}
-		
+		if($protocol == true)
+		{
+			return "//" . $this->hostname()."/".trim($uri,"/");
+		}
 		return "/".trim($uri,"/");
 		/*
 		// Chop off possible scheme, host, port, user and pass parts

@@ -6,8 +6,9 @@
  */
 
 namespace Door\Core\Library;
-use \Door\Core\Route;
-use \Door\Core\Request;
+use Door\Core\Route;
+use Door\Core\Request;
+use Door\Core\Wrapper;
 
 /**
  * Description of Router
@@ -26,7 +27,25 @@ class Router extends \Door\Core\Library {
 	 *
 	 * @var array
 	 */
-	protected $contoller_aliases = array();
+	protected $controller_aliases = array();
+	
+	/**
+	 *
+	 * @var array
+	 */
+	protected $controller_configs = array();
+	
+	/**
+	 *
+	 * @var array
+	 */
+	protected $wrapper_aliases = array();
+	
+	/**
+	 *
+	 * @var array
+	 */
+	protected $wrapper_configs = array();
 	
 	
 	/**
@@ -46,14 +65,23 @@ class Router extends \Door\Core\Library {
 	 */	
 	public function add($name, $uri, $controller, array $regex = array()){
 		
+		$controller_config = array();
+		
 		if(isset($this->contoller_aliases[$controller]))
 		{
-			$controller = $this->contoller_aliases[$controller];
+			$controller_config = $this->controller_configs[$controller];
+			$controller = $this->contoller_aliases[$controller];			
 		}
 		
-		return $this->routes[$name] = new Route($uri, $controller, $regex);
+		$route = new Route($uri, $controller, $regex);
 		
+		$route->controller_config($controller_config);
+		
+		$this->routes[$name] = $route;
+		
+		return $route;		
 	}	
+
 	
 	/**
 	 * Get the name of a route.
@@ -83,7 +111,7 @@ class Router extends \Door\Core\Library {
 		return $this->routes[$name];
 	}
 	
-	public function get_controller(Request $request)
+	public function get_workers(Request $request)
 	{
 		/*@var Route $route */
 		foreach($this->routes as $route)
@@ -91,18 +119,91 @@ class Router extends \Door\Core\Library {
 			$params = $route->matches($request);
 			if($params !== false)			
 			{
+				$request->set_params($params);
 				$controller_config = $route->controller_config();
 				$controller_class = $route->controller();
-				return new $controller_class($this->app, $request, $params, $controller_config);
+				$controller = $controller_class($this->app, $request, $controller_config);
+				
+				$wrappers = array();
+				$wrappers_data = $route->wrappers();
+				
+				usort($wrappers_data, function($a, $b)
+				{
+					if ($a['weight'] == $b['weight'])
+					{
+						return 0;
+					}
+					else if ($a['weight'] > $b['weight'])
+					{
+						return -1;
+					}
+					else 
+					{
+						return 1;
+					}
+				});			
+				
+				foreach($wrappers_data as $wrapper_data)
+				{
+					$wrappers[] = $this->create_wrapper($request, $wrapper_data['wrapper'], $wrapper_data['config']);
+				}
+				
+				return array(
+					"controller" => $controller,
+					"wrappers" => $wrappers
+				);
+				
+				
 			}
 		}
 		
 		return null;
 	}
 	
-	public function controller_alias($alias, $class_name)
+	public function register_controller($alias, $controller, $config = array())
 	{
-		$this->contoller_aliases[$alias] = $class_name;
+		if(isset($this->controller_aliases[$controller]))
+		{
+			$config += $this->controller_configs[$controller];
+			$controller = $this->controller_aliases[$controller];			
+		}
+		
+		$this->controller_aliases[$alias] = $controller;
+		
+		$this->controller_configs[$alias] = $config;
+				
+	}
+	
+	public function register_wrapper($alias, $wrapper, $config = array())
+	{
+		if(isset($this->wrapper_aliases[$wrapper]))
+		{
+			$config += $this->wrapper_configs[$wrapper];
+			$wrapper = $this->wrapper_aliases[$wrapper];			
+		}
+		
+		$this->wrapper_aliases[$alias] = $wrapper;
+		
+		$this->wrapper_configs[$alias] = $config;
+				
+	}
+	
+	/**
+	 * 
+	 * @param \Door\Core\Request $request
+	 * @param type $wrapper
+	 * @param type $config
+	 * @return Wrapper
+	 */
+	protected function create_wrapper(Request $request, $wrapper, $config = array())
+	{
+		if(isset($this->wrapper_aliases[$wrapper]))
+		{
+			$config = $config + $this->wrapper_configs[$wrapper];
+			$wrapper = $this->wrapper_aliases[$wrapper];			
+		}
+		
+		return new $wrapper($this->app, $request, $config);			
 	}
 	
 	

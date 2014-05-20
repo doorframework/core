@@ -160,6 +160,15 @@ abstract class Model{
 						$value = null;
 					}
 					break;
+				case "boolean":
+					if(strtolower($value) == 'on'){
+						$value = true;
+					} elseif(strtolower($value) == 'off'){
+						$value = false;
+					} else {
+						$value = (boolean)$value;
+					}
+					break;
 				case "mongoid":
 					if(!is_object($value)){
 						$value = new MongoId($value);
@@ -180,10 +189,17 @@ abstract class Model{
 					if( !($value instanceof Model)){
 						throw new Exception("can`t set this argument");
 					}					
-					$this->{$this->relation['field']} = $value->pk();									
+					$this->{$relation['field']} = $value->pk();									
+					break;
+				case \Door\Core\Database\Relation::MANY_TO_MANY:
+					if( ! is_array($value))
+					{
+						$value = explode(",", $value);
+					}
+					$this->$column->from_array($value);										
 					break;
 				case \Door\Core\Database\Relation::ONE_TO_MANY:
-				case \Door\Core\Database\Relation::MANY_TO_MANY:
+				
 				default:
 					throw new Exception('can`t set relation :relation', array($relation['type']));
 			}
@@ -269,9 +285,7 @@ abstract class Model{
 		if(isset($this->_relations[$column]))
 		{
 			$relation = $this->_relations[$column];
-			
-			$foreign_relations = $this->get_relations($relation['model']);
-			$foreign_relation = $foreign_relations[$relation['foreignKey']];
+						
 			
 			if($relation['type'] == 'many_to_many'){
 				
@@ -280,6 +294,9 @@ abstract class Model{
 						$column);									
 				
 			} elseif($relation['type'] == 'one_to_many') { 
+				
+				$foreign_relations = $this->get_relations($relation['model']);			
+				$foreign_relation = $foreign_relations[$relation['foreignKey']];
 				
 				$return_value = $this->app()->models->factory($relation['model']);
 				$return_value->where($foreign_relation['field'], $this->pk());

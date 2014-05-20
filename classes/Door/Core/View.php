@@ -178,7 +178,7 @@ class View {
 		{
 			return $this->render();
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
 			/**
 			 * Display the exception message.
@@ -186,9 +186,7 @@ class View {
 			 * We use this method here because it's impossible to throw and
 			 * exception from __toString().
 			 */
-			$error_response = Kohana_Exception::_handler($e);
-
-			return $error_response->body();
+			return $e->getMessage();
 		}
 	}
 

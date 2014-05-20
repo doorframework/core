@@ -29,7 +29,26 @@ class Bootstrap {
 		"lang" => '/Door/Core/Library/Lang'
 	);	
 	
-	public static function register_core(Application $app)
+	protected static $core_models = array(
+		"User" => array(
+			"class" => "/Door/Core/Model/User",
+			"collection" => "users"
+		),
+		"Role" => array(
+			"class" => "/Door/Core/Model/Role",
+			"collection" => "roles"
+		),
+		"Image" => array(
+			"class" => "/Door/Core/Model/Image",
+			"collection" => "images"
+		),
+		"User_Token" => array(
+			"class" => "/Door/Core/Model/User/Token",
+			"collection" => "user_tokens"
+		),
+	);		
+	
+	public static function init(Application $app)
 	{
 		foreach(self::$core_libraries as $library => $class_name)
 		{
@@ -38,6 +57,16 @@ class Bootstrap {
 				$app->register_library($library, $class_name);
 			}
 		}		
+		
+		foreach(self::$core_models as $model => $cfg)
+		{
+			if( ! $app->models->model_registered($model))
+			{
+				$app->models->add($model, $cfg['class'], $cfg['collection']);
+			}
+		}
+		
+		$app->router->register_wrapper("core/needauth", "/Door/Core/Wrapper/Needauth");
 		
 		register_shutdown_function(array($app->session, 'write'));
 		

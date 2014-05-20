@@ -45,6 +45,8 @@ class Route {
 	protected $defaults = array();
 	
 	protected $controller_config = array();
+			
+	protected $wrappers = array();
 
 	public function __construct($uri, $controller_class, array $regex = array())
 	{
@@ -147,8 +149,13 @@ class Route {
 		}
 		else
 		{
-			$this->controller_config = $params;
+			$this->controller_config = $params + $this->controller_confign;
 		}		
+	}
+	
+	public function reset_config()
+	{
+		$this->controller_config = array();
 	}
 	
 	/**
@@ -249,5 +256,19 @@ class Route {
 	public function controller()
 	{
 		return $this->controller_class;
+	}
+	
+	public function wrap($wrapper, $config = array(), $weight = 0)
+	{
+		$this->wrappers[] = array(
+			'wrapper' => $wrapper,
+			'config' => $config,
+			'weight' => $weight
+		);
+	}
+	
+	public function wrappers()
+	{
+		return $this->wrappers;
 	}
 }

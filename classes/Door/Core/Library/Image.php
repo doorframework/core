@@ -183,10 +183,8 @@ class Image extends \Door\Core\Library {
 		$model_image->extension = $extension;
 		$model_image->width = $image->getSize()->getWidth();
 		$model_image->height = $image->getSize()->getHeight();
-		$model_image->save();
-
-		$path = $this->calculate_path($model_image->pk(), $extension);
-		
+		$model_image->save();		
+		$path = $this->calculate_path($model_image->pk(), $extension);		
 		$dirname = dirname($path);
 		if( !file_exists($dirname))
 		{
@@ -223,7 +221,7 @@ class Image extends \Door\Core\Library {
 	
 	protected function calculate_path($image_id, $extension, $presentation = 'default')
 	{
-		return $this->app->docroot()."/".$this->calculate_url($image_id, $extension, $presentation);
+		return $this->app->docroot()."/".$this->calculate_uri($image_id, $extension, $presentation);
 	}
 	
 	protected function calculate_uri($image_id, $extension, $presentation = 'default')

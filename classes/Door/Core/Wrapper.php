@@ -8,7 +8,7 @@ use Door\Core\Helper\Arr;
  *
  * @author serginho
  */
-abstract class Controller {
+abstract class Wrapper {
 		
 	/**
 	 * @var Request
@@ -28,12 +28,26 @@ abstract class Controller {
 	protected $response;
 	
 	/**
+	 * default params for controller
+	 * @var array
+	 */
+	protected $defaults = array();
+	
+	/**
 	 * @var array
 	 */
 	private $params = array();
 	
-	final public function __construct(Application $app, Request $request, array $config = array())
-	{		
+	final public function __construct(Application $app, Request $request, array $params = array(), array $config = array())
+	{
+		foreach($this->defaults as $key => $value)
+		{
+			if( !array_key_exists($key, $params))
+			{
+				$params[$key] = $value;
+			}
+		}
+		
 		foreach($config as $key => $value)
 		{
 			if(property_exists($this, $key))
@@ -43,6 +57,7 @@ abstract class Controller {
 		}
 		
 		$this->request = $request;
+		$this->params = $params;
 		$this->app = $app;
 		$this->response = $request->response();
 		$this->init();
@@ -56,21 +71,29 @@ abstract class Controller {
 		
 	}
 	
+	public function before()
+	{
+		
+	}
+	
+	public function after()
+	{
+		
+	}
+	
 	/**
 	 * get request parameter
 	 * @return mixed
 	 */
 	protected function param($name)
 	{
-		return $this->request->param($name);
+		return Arr::get($this->params, $name);
 	}
 	
 	protected function view($name, $data = null)
 	{
 		return $this->app->views->get($name, $data);
 	}
-	
-	public abstract function execute();	
 	
 	protected function redirect($uri)
 	{

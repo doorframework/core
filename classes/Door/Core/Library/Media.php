@@ -279,12 +279,14 @@ class Media extends \Door\Core\Library {
 		
 		foreach($success_paths as $path_config)
 		{
+			$file1 = $file;
+			
 			if($path_config['prefix_in_path'] == false)
 			{
-				$file = substr($file, strlen($path_config['prefix']) + 1);
+				$file1 = substr($file, strlen($path_config['prefix']) + 1);
 			}
 			
-			$path = $path_config['path'] . "/" . $file;
+			$path = $path_config['path'] . "/" . $file1;
 			
 			if(file_exists($path))
 			{

@@ -71,8 +71,12 @@ class Relation {
 		return $return_value;
 	}
 	
-	public function add(Model $model)			
+	public function add($model)			
 	{
+		if( !is_object($model))
+		{
+			$model = $this->model2->app()->models->factory($this->model2->get_model_name(), $model);
+		}		
 		
 		if($model->get_model_name() !== $this->relation1['model']){
 			
@@ -359,6 +363,56 @@ class Relation {
 			
 			throw new Kohana_Exception("can`t get ids for this relation");
 		}
+	}
+	
+	public function from_array(array $ids)
+	{
+		$old_ids = $this->get_ids();
+		$remove_ids = array_diff($old_ids, $ids);
+		$add_ids = array_diff($ids, $old_ids);
+		
+		foreach($remove_ids as $remove_id)
+		{
+			$this->remove($remove_id);
+		}
+		
+		foreach($add_ids as $add_id)
+		{
+			$this->add($id);
+		}
+		
+		$new_ids = array();
+		foreach($ids as $id)
+		{
+			if( ! ($id instanceof \MongoId)){
+				$id = new \MongoId($id);
+			}
+			$new_ids[] = $id;
+		}		
+		
+		if(isset($this->relation1['field'])){
+
+			$field = $this->relation1['field'];		
+			
+			$this->model1->$field = $new_ids;
+			
+
+		} else {
+
+			$collection = $this->model1->db()->selectCollection(self::COLLECTION);
+
+			$id = "{$this->model1->get_model_name()}:{$this->model1->pk()}:{$this->field1}";
+
+			$collection->update(
+					array("_id" => $id,
+						'model' => $this->model1->get_model_name(),
+						'model_id' => $this->model1->pk(),
+						'field' => $this->field1), 
+					array('ids' => $new_ids)
+				);						
+
+		}		
+		
 	}
 	
 	/**

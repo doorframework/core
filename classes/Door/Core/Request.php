@@ -1,7 +1,9 @@
 <?php
 
 namespace Door\Core;
-use Door\Request\Exception;
+use Door\Core\Helper\Arr;
+use Door\Core\Worker;
+
 
 /**
  * Description of Request
@@ -18,6 +20,10 @@ class Request {
 	protected $app;
 	
 	protected $path = array();	
+	
+	protected $data = array();
+	
+	protected $params = array();
 	
 	/**
 	 *
@@ -67,11 +73,45 @@ class Request {
 	
 	public function execute()
 	{
-		$controller = $this->app->router->get_controller($this);
+		list($controller, $wrappers) = $this->app->router->get_workers($this);				
 		
 		if($controller != null)
 		{
-			$controller->execute();
+			foreach($wrappers as $wrapper)
+			{				
+				$wrapper->before();
+				
+				if($this->has_stopped())
+				{
+					break;
+				}
+			}			
+			
+			if( ! $this->has_stopped())
+			{
+				$controller->execute();													
+			}
+			
+			if( ! $this->has_stopped())
+			{
+				foreach($wrappers as $wrapper)
+				{				
+					$wrapper->after();
+
+					if($this->has_stopped())
+					{
+						break;
+					}
+				}	
+			}		
+			
+			if($this->has_stopped())
+			{
+				if(strlen($this->response->content_length()) == 0)
+				{
+					$this->response->body('error occured');
+				}
+			}								
 		}
 		else
 		{			
@@ -88,6 +128,36 @@ class Request {
 	public function response()
 	{
 		return $this->response;
+	}
+	
+	public function data($name = null, $value = null)
+	{
+		if($value === null && $name === null)
+		{
+			return $this->data;
+		}
+		if($value === null && $name !== null)
+		{
+			return Arr::get($this->data, $name);
+		}
+		
+		$this->data[$name] = $value;
+	}
+	
+	public function set_params(array $params)
+	{
+		$this->params = $params;
+	}
+	
+	public function param($param)
+	{
+		return Arr::get($this->params, $param);
+	}
+	
+	public function has_stopped()
+	{
+		return intval($this->response->status()) != 200
+			|| $this->response->headers('Location') != null;
 	}
 	
 	
