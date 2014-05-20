@@ -2,8 +2,11 @@ Door framework.
 
 Fork of the Kohana Framework.
 
-No static ol global functions.
+No global functions.
+Minimum static functions.
 No global constants.
-Only one singleton.
 
 In development.
+<code>
+
+</code>
