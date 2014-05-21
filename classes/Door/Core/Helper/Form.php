@@ -1,5 +1,4 @@
 <?php 
-
 namespace Door\Core\Helper;
 
 /**
