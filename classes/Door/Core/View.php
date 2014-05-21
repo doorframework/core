@@ -180,6 +180,7 @@ class View {
 		}
 		catch (\Exception $e)
 		{
+			ob_clean();
 			/**
 			 * Display the exception message.
 			 *

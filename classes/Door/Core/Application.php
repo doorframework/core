@@ -195,6 +195,11 @@ class Application {
 		return $this->docroot;
 	}
 	
+	public function is_id($id)
+	{
+		return ($id instanceof \MongoId) || strlen($id) == 24;
+	}
+	
 	
 	
 }

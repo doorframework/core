@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php 
 
 namespace Door\Core\Helper;
 
@@ -33,7 +33,7 @@ class Form {
 	 * @return  string
 	 * @uses    Request::instance
 	 * @uses    URL::site
-	 * @uses    HTML::attributes
+	 * @uses    self::attributes
 	 */
 	public static function open($action = NULL, array $attributes = NULL)
 	{
@@ -66,7 +66,7 @@ class Form {
 			$attributes['method'] = 'post';
 		}
 
-		return '<form'.HTML::attributes($attributes).'>';
+		return '<form'.self::attributes($attributes).'>';
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Form {
 	 * @param   string  $value      input value
 	 * @param   array   $attributes html attributes
 	 * @return  string
-	 * @uses    HTML::attributes
+	 * @uses    self::attributes
 	 */
 	public static function input($name, $value = NULL, array $attributes = NULL)
 	{
@@ -107,7 +107,7 @@ class Form {
 			$attributes['type'] = 'text';
 		}
 
-		return '<input'.HTML::attributes($attributes).' />';
+		return '<input'.self::attributes($attributes).' />';
 	}
 
 	/**
@@ -224,7 +224,7 @@ class Form {
 	 * @param   array   $attributes     html attributes
 	 * @param   boolean $double_encode  encode existing HTML characters
 	 * @return  string
-	 * @uses    HTML::attributes
+	 * @uses    self::attributes
 	 * @uses    HTML::chars
 	 */
 	public static function textarea($name, $body = '', array $attributes = NULL, $double_encode = TRUE)
@@ -235,7 +235,7 @@ class Form {
 		// Add default rows and cols attributes (required)
 		$attributes += array('rows' => 10, 'cols' => 50);
 
-		return '<textarea'.HTML::attributes($attributes).'>'.HTML::chars($body, $double_encode).'</textarea>';
+		return '<textarea'.self::attributes($attributes).'>'.HTML::chars($body, $double_encode).'</textarea>';
 	}
 
 	/**
@@ -250,7 +250,7 @@ class Form {
 	 * @param   mixed   $selected   selected option string, or an array of selected options
 	 * @param   array   $attributes html attributes
 	 * @return  string
-	 * @uses    HTML::attributes
+	 * @uses    self::attributes
 	 */
 	public static function select($name, array $options = NULL, $selected = NULL, array $attributes = NULL)
 	{
@@ -309,13 +309,13 @@ class Form {
 						}
 
 						// Change the option to the HTML string
-						$_options[] = '<option'.HTML::attributes($option).'>'.HTML::chars($_name, FALSE).'</option>';
+						$_options[] = '<option'.self::attributes($option).'>'.HTML::chars($_name, FALSE).'</option>';
 					}
 
 					// Compile the options into a string
 					$_options = "\n".implode("\n", $_options)."\n";
 
-					$options[$value] = '<optgroup'.HTML::attributes($group).'>'.$_options.'</optgroup>';
+					$options[$value] = '<optgroup'.self::attributes($group).'>'.$_options.'</optgroup>';
 				}
 				else
 				{
@@ -332,7 +332,7 @@ class Form {
 					}
 
 					// Change the option to the HTML string
-					$options[$value] = '<option'.HTML::attributes($option).'>'.HTML::chars($name, FALSE).'</option>';
+					$options[$value] = '<option'.self::attributes($option).'>'.self::chars($name, FALSE).'</option>';
 				}
 			}
 
@@ -340,7 +340,7 @@ class Form {
 			$options = "\n".implode("\n", $options)."\n";
 		}
 
-		return '<select'.HTML::attributes($attributes).'>'.$options.'</select>';
+		return '<select'.self::attributes($attributes).'>'.$options.'</select>';
 	}
 
 	/**
@@ -399,14 +399,14 @@ class Form {
 	 * @param   string  $body       input value
 	 * @param   array   $attributes html attributes
 	 * @return  string
-	 * @uses    HTML::attributes
+	 * @uses    self::attributes
 	 */
 	public static function button($name, $body, array $attributes = NULL)
 	{
 		// Set the input name
 		$attributes['name'] = $name;
 
-		return '<button'.HTML::attributes($attributes).'>'.$body.'</button>';
+		return '<button'.self::attributes($attributes).'>'.$body.'</button>';
 	}
 
 	/**
@@ -418,7 +418,7 @@ class Form {
 	 * @param   string  $text       label text
 	 * @param   array   $attributes html attributes
 	 * @return  string
-	 * @uses    HTML::attributes
+	 * @uses    self::attributes
 	 */
 	public static function label($input, $text = NULL, array $attributes = NULL)
 	{
@@ -431,7 +431,64 @@ class Form {
 		// Set the label target
 		$attributes['for'] = $input;
 
-		return '<label'.HTML::attributes($attributes).'>'.$text.'</label>';
+		return '<label'.self::attributes($attributes).'>'.$text.'</label>';
 	}
+	
+	/**
+	 * Compiles an array of HTML attributes into an attribute string.
+	 * Attributes will be sorted using $this->attribute_order for consistency.
+	 *
+	 *     echo '<div'.$this->attributes($attrs).'>'.$content.'</div>';
+	 *
+	 * @param   array   $attributes attribute list
+	 * @return  string
+	 */
+	public static function attributes(array $attributes = NULL)
+	{
+		if (empty($attributes))
+			return '';
+
+		$compiled = '';
+		foreach ($attributes as $key => $value)
+		{
+			if ($value === NULL)
+			{
+				// Skip attributes that have NULL values
+				continue;
+			}
+
+			if (is_int($key))
+			{
+				// Assume non-associative keys are mirrored attributes
+				$key = $value;
+			}
+
+			// Add the attribute key
+			$compiled .= ' '.$key;
+
+			if ($value)
+			{
+				// Add the attribute value
+				$compiled .= '="'.self::chars($value).'"';
+			}
+		}
+
+		return $compiled;
+	}	
+	
+	/**
+	 * Convert special characters to HTML entities. All untrusted content
+	 * should be passed through this method to prevent XSS injections.
+	 *
+	 *     echo $this->chars($username);
+	 *
+	 * @param   string  $value          string to convert
+	 * @param   boolean $double_encode  encode existing entities
+	 * @return  string
+	 */
+	public static function chars($value, $double_encode = TRUE)
+	{
+		return htmlspecialchars( (string) $value, ENT_QUOTES, 'utf-8', $double_encode);
+	}	
 
 }

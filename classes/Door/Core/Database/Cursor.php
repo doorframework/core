@@ -28,6 +28,7 @@ class Cursor extends \MongoCursor {
 		
 		$this->model_name = $model->get_model_name();
 		$this->model = $model;
+		
 		parent::__construct($connection, $ns, $query, $fields);
 	}
 	

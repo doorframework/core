@@ -49,6 +49,13 @@ class Text {
 		2  => 'two',
 		1  => 'one',
 	);
+	
+	public static function alias($text)
+	{
+		$text = preg_replace('/[^A-Za-z0-9_\-\.\pL]/u', '_', $text);
+		$text = preg_replace('/[_]+/', '_', $text);	
+		return trim($text, "_");
+	}
 
 	/**
 	 * Limits a phrase to a given number of words.

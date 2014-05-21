@@ -3,7 +3,7 @@
 namespace Door\Core\Controller;
 use Door\Core\Controller;
 use Door\Core\View;
-use Door\Core\Helper\HTML;
+use Door\Core\Model;
 
 /**
  * Layout controller. Can be only one layout controller for request.

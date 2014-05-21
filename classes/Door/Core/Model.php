@@ -205,7 +205,7 @@ abstract class Model{
 			}
 			
 		} else {
-			throw new Exception("column :column not found", array(":column" => $column));
+			throw new \Exception("column $column not found");
 		}
 		
 		
@@ -299,7 +299,7 @@ abstract class Model{
 				$foreign_relation = $foreign_relations[$relation['foreignKey']];
 				
 				$return_value = $this->app()->models->factory($relation['model']);
-				$return_value->where($foreign_relation['field'], $this->pk());
+				$return_value->where($foreign_relation['field'],'=', $this->pk());
 				return $return_value;
 				
 			} elseif($relation['type'] == 'many_to_one') {
@@ -352,7 +352,7 @@ abstract class Model{
 			$this->app()->models->factory($model_name);
 		}
 		
-		self::$_init_cache[$model_name]['_relations'];
+		return self::$_init_cache[$model_name]['_relations'];
 		
 	}
 	

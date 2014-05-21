@@ -9,6 +9,7 @@ use Door\Core\Model\Image as Model_Image;
 use Door\Core\Helper\Arr;
 use Imagine\Gd\Imagine;
 use Imagine\Gd\Image as Img;
+use Exception;
 
 /**
  * Library for Image manipulation
