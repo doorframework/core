@@ -81,14 +81,13 @@ class Cursor extends \MongoCursor {
 					$return_value[$data[$key]] = $this->load_model($data);
 				}				
 				
-			} else {
+			} else {				
 				if(array_key_exists($key, $data) && array_key_exists($value, $data)){
 					$return_value[(string)$data[$key]] = $data[(string)$value];
 				}							
 			}
 			
 		}
-		
 		return $return_value;
 	}
 	
