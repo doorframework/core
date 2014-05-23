@@ -200,6 +200,15 @@ class Application {
 		return ($id instanceof \MongoId) || strlen($id) == 24;
 	}
 	
+	/**
+	 * Is application in production
+	 * @return boolean
+	 */
+	public function is_production()
+	{
+		return $this->environment == self::PRODUCTION;
+	}
+	
 	
 	
 }

@@ -17,8 +17,6 @@ class Media extends \Door\Core\Controller{
 	
 	public function execute() {
 		
-		
-		
 		$path = $this->param('path');
 		
 		$file_path = $this->app->media->get_path($path);
@@ -39,10 +37,8 @@ class Media extends \Door\Core\Controller{
 		//Копируем файл в папку media самого сайта
 		if(false)
 		{
-			$ds = DIRECTORY_SEPARATOR;
-			$arr = explode("{$ds}media{$ds}", $filename);
-			array_shift($arr);
-			$new_file = DOCROOT."media{$ds}" . implode("{$ds}media{$ds}", $arr);
+
+			$new_file = $this->app->docroot()."/media/" . implode("{$ds}media{$ds}", $arr);
 
 			$path_info = pathinfo($new_file);
 			if(!file_exists($path_info['dirname']))
