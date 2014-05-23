@@ -64,7 +64,7 @@ class Relation {
 	 * 
 	 * @return Model
 	 */
-	public function find_all()
+	public function model()
 	{
 		$return_value = $this->model1->app()->models->factory($this->relation1['model']);
 		$return_value->where("_id",'in', $this->get_ids());
