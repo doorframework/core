@@ -6,16 +6,15 @@
  */
 
 namespace Door\Core;
-use Composer\Installer\LibraryInstaller;
+use Composer\Installer\InstallerInterface;
 use Composer\Package\PackageInterface;
-use Composer\Repository\InstalledRepositoryInterface;
 
 /**
  * Description of Installer
  *
  * @author serginho
  */
-class ComposerInstaller extends LibraryInstaller{
+class ComposerInstaller extends InstallerInterface{
 	
     public function supports($packageType)
     {
