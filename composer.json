@@ -10,12 +10,9 @@
 			"homepage": "http://serginho.ru/"
 		}
     ],
-    "extra": {
-        "class": "Door\\Core\\ComposerInstaller"
-    },	
     "require": {
         "php" : ">5.4",
-		"imagine/imagine": "0.5"
+		"imagine/imagine": "0.6.*@dev"
     },
     "autoload": {
         "psr-0" : {
