@@ -25,20 +25,13 @@ class ComposerInstaller extends LibraryInstaller{
     /**
      * Retrieves the Installer's provided component directory.
      */
-    public function getComponentDir()
+    public function getInstallDir()
     {
         $config = $this->composer->getConfig();
         return $config->has('door-module-dir') ? $config->get('door-module-dir') : 'modules';
     }	
 	
-	
-    /**
-     * Gets the destination Component directory.
-     *
-     * @return string
-     *   The path to where the final Component should be installed.
-     */
-    public function getComponentPath(PackageInterface $package)
+    public function getInstallPath(PackageInterface $package, $frameworkType = '')
     {
         // Parse the pretty name for the vendor and package name.
         $name = $prettyName = $package->getPrettyName();
