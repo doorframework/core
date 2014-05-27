@@ -10,6 +10,9 @@
 			"homepage": "http://serginho.ru/"
 		}
     ],
+    "extra": {
+        "class": "Door\\Core\\TemplateInstallerPlugin"
+    },	
     "require": {
         "php" : ">5.4",
 		"imagine/imagine": "0.5"
