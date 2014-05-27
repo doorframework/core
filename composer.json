@@ -11,7 +11,7 @@
 		}
     ],
     "extra": {
-        "class": "Door\\Core\\TemplateInstallerPlugin"
+        "class": "Door\\Core\\ComposerInstaller"
     },	
     "require": {
         "php" : ">5.4",
