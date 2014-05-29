@@ -26,7 +26,7 @@ class Bootstrap {
 		"image" => '/Door/Core/Library/Image',
 		"database" => '/Door/Core/Library/Database',
 		"models" => '/Door/Core/Library/Models',
-		"lang" => '/Door/Core/Library/Lang'
+		"lang" => '/Door/Core/Library/Language'
 	);	
 	
 	protected static $core_models = array(

@@ -6,14 +6,13 @@
  */
 
 namespace Door\Core;
-use Exception;
 
 /**
  * Base class for libraries
  *
  * @author serginho
  */
-abstract class Library {
+abstract class Library extends Observer {
 	
 	/**
 	 *

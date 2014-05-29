@@ -28,12 +28,18 @@ abstract class Wrapper {
 	protected $response;
 	
 	/**
+	 *
+	 * @var Controller
+	 */
+	protected $controller;
+	
+	/**
 	 * default params for controller
 	 * @var array
 	 */
 	protected $defaults = array();
 	
-	final public function __construct(Application $app, Request $request, array $config = array())
+	final public function __construct(Application $app, Request $request, Controller $controller, array $config = array())
 	{
 		
 		foreach($config as $key => $value)
@@ -47,6 +53,7 @@ abstract class Wrapper {
 		$this->request = $request;
 		$this->app = $app;
 		$this->response = $request->response();
+		$this->controller = $controller;
 		$this->init();
 	}
 	

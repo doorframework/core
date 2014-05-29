@@ -60,9 +60,9 @@ abstract class Controller {
 	 * get request parameter
 	 * @return mixed
 	 */
-	protected function param($name)
+	protected function param($name, $default = null)
 	{
-		return $this->request->param($name);
+		return $this->request->param($name, $default);
 	}
 	
 	protected function view($name, $data = null)

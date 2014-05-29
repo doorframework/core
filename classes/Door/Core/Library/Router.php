@@ -9,6 +9,7 @@ namespace Door\Core\Library;
 use Door\Core\Route;
 use Door\Core\Request;
 use Door\Core\Wrapper;
+use Door\Core\Controller;
 
 /**
  * Description of Router
@@ -160,7 +161,7 @@ class Router extends \Door\Core\Library {
 				
 				foreach($wrappers_data as $wrapper_data)
 				{
-					$wrappers[] = $this->create_wrapper($request, $wrapper_data['wrapper'], $wrapper_data['config']);
+					$wrappers[] = $this->create_wrapper($request, $controller, $wrapper_data['wrapper'], $wrapper_data['config']);
 				}
 				
 				return array(
@@ -212,7 +213,7 @@ class Router extends \Door\Core\Library {
 	 * @param type $config
 	 * @return Wrapper
 	 */
-	protected function create_wrapper(Request $request, $wrapper, $config = array())
+	protected function create_wrapper(Request $request, Controller $controller, $wrapper, $config = array())
 	{
 		if(isset($this->wrapper_aliases[$wrapper]))
 		{
@@ -220,7 +221,7 @@ class Router extends \Door\Core\Library {
 			$wrapper = $this->wrapper_aliases[$wrapper];			
 		}
 		
-		return new $wrapper($this->app, $request, $config);			
+		return new $wrapper($this->app, $request, $controller, $config);			
 	}
 	
 	public function wrap($prefix, $wrapper, $config = array(), $weight = 0)

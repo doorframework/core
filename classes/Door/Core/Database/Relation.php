@@ -71,6 +71,11 @@ class Relation {
 		return $return_value;
 	}
 	
+	public function related_model()
+	{
+		return $this->relation1['model'];
+	}
+	
 	public function add($model)			
 	{
 		if( !is_object($model))

@@ -73,6 +73,10 @@ class Request {
 	
 	public function execute()
 	{
+		//$this->app()->run_event('beforedelete', $this);
+		$this->app->router->run_event('beforeexecute', $this);
+		
+		
 		$workers = $this->app->router->get_workers($this);
 		$controller = Arr::get($workers, 'controller');
 		$wrappers = Arr::get($workers, 'wrappers', array());
@@ -151,9 +155,9 @@ class Request {
 		$this->params = $params;
 	}
 	
-	public function param($param)
+	public function param($param, $default = null)
 	{
-		return Arr::get($this->params, $param);
+		return Arr::get($this->params, $param, $default);
 	}
 	
 	public function has_stopped()

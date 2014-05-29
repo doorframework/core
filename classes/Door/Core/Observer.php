@@ -1,6 +1,6 @@
 <?php
 
-namespace Door\Core\Library;
+namespace Door\Core;
 
 /**
  * Process queuing/execution class. Allows an unlimited number of callbacks
@@ -17,17 +17,17 @@ namespace Door\Core\Library;
  * @copyright  (c) 2009-2010 Kohana Team
  * @license    http://kohanaphp.com/license
  */
-class Events extends \Door\Core\Library{
+class Observer {
 
 	/**
 	 * @var  array containing events and callbacks
 	 */
-	protected $events = array();
+	private $observer_events = array();
 
 	/**
 	 * @var  array containing events that have run
 	 */
-	protected $has_run = array();
+	private $observer_has_run = array();
 
 	/**
 	 * Add a callback to the event stack
@@ -37,21 +37,21 @@ class Events extends \Door\Core\Library{
 	 * @param   boolean  unique prevents duplicate events
 	 * @return  boolean
 	 */
-	public function add($name, array $callback, $unique = FALSE)
+	public function on($name, array $callback, $unique = FALSE)
 	{
-		if ( ! isset($this->events[$name]))
+		if ( ! isset($this->observer_events[$name]))
 		{
 			// Create an empty event for undefined events
-			$this->events[$name] = array();
+			$this->observer_events[$name] = array();
 		}
-		elseif ($unique and in_array($callback, $this->events[$name], TRUE))
+		elseif ($unique and in_array($callback, $this->observer_events[$name], TRUE))
 		{
 			// Event already exists
 			return FALSE;
 		}
 
 		// Add the event
-		$this->events[$name][] = $callback;
+		$this->observer_events[$name][] = $callback;
 
 		return TRUE;
 	}
@@ -64,12 +64,12 @@ class Events extends \Door\Core\Library{
 	 * @param   array    callback 
 	 * @return  boolean
 	 */
-	public function add_before($name, array $existing, array $callback)
+	public function on_before($name, array $existing, array $callback)
 	{
-		if (empty($this->events[$name]) or FALSE === ($key = array_search($existing, $this->events[$name], TRUE)))
+		if (empty($this->observer_events[$name]) or FALSE === ($key = array_search($existing, $this->observer_events[$name], TRUE)))
 		{
 			// No need to insert, just add
-			return $this->add($name, $callback);
+			return $this->on($name, $callback);
 		}
 
 		// Insert the event immediately before the existing event
@@ -84,12 +84,12 @@ class Events extends \Door\Core\Library{
 	 * @param   array    callback 
 	 * @return  boolean
 	 */
-	public function add_after($name, array $existing, array $callback)
+	public function on_after($name, array $existing, array $callback)
 	{
-		if (empty($this->events[$name]) or FALSE === ($key = array_search($existing, $this->events[$name], TRUE)))
+		if (empty($this->observer_events[$name]) or FALSE === ($key = array_search($existing, $this->observer_events[$name], TRUE)))
 		{
 			// No need to insert, just add
-			return $this->add($name, $callback);
+			return $this->on($name, $callback);
 		}
 
 		// Insert the event immediately after the existing event
@@ -104,22 +104,22 @@ class Events extends \Door\Core\Library{
 	 * @param   array    callback 
 	 * @return  boolean
 	 */
-	public function replace($name, array $existing, array $callback)
+	public function replace_event($name, array $existing, array $callback)
 	{
-		if (empty($this->events[$name]) or FALSE === ($key = array_search($existing, $this->events[$name], TRUE)))
+		if (empty($this->observer_events[$name]) or FALSE === ($key = array_search($existing, $this->observer_events[$name], TRUE)))
 			return FALSE;
 
-		if ( ! in_array($callback, $this->events[$name], TRUE))
+		if ( ! in_array($callback, $this->observer_events[$name], TRUE))
 		{
-			$this->events[$name][$key] = $callback;
+			$this->observer_events[$name][$key] = $callback;
 			return TRUE;
 		}
 
 		// Remove event from the stack
-		unset($this->events[$name][$key]);
+		unset($this->observer_events[$name][$key]);
 
 		// Reset the array to preserve ordering
-		$this->events[$name] = array_values($this->events[$name]);
+		$this->observer_events[$name] = array_values($this->observer_events[$name]);
 
 		return TRUE;
 	}
@@ -130,9 +130,9 @@ class Events extends \Door\Core\Library{
 	 * @param   string   name 
 	 * @return  array
 	 */
-	public function get($name)
+	public function get_event($name)
 	{
-		return empty($this->events[$name]) ? array() : $this->events[$name];
+		return empty($this->observer_events[$name]) ? array() : $this->observer_events[$name];
 	}
 
 	/**
@@ -142,31 +142,31 @@ class Events extends \Door\Core\Library{
 	 * @param   array    callback 
 	 * @return  void
 	 */
-	public function clear($name = NULL, array $callback = NULL)
+	public function clear_events($name = NULL, array $callback = NULL)
 	{
 		if (NULL === $name and NULL === $callback)
 		{
 			// Clear all events
-			$this->events = array();
+			$this->observer_events = array();
 			return;
 		}
 
 		if (NULL === $callback)
 		{
 			// Clear named events
-			$this->events[$name] = array();
+			$this->observer_events[$name] = array();
 			return;
 		}
 
 		// If the name does not exist or the callback cannot be found, return
-		if ( ! isset($this->events[$name]) or FALSE === ($key = array_search($callback, $this->events[$name], TRUE)))
+		if ( ! isset($this->observer_events[$name]) or FALSE === ($key = array_search($callback, $this->observer_events[$name], TRUE)))
 			return;
 
 		// Unset the callback
-		unset($this->events[$name][$key]);
+		unset($this->observer_events[$name][$key]);
 
 		// Reset the array to preserve ordering
-		$this->events[$name] = array_values($this->events[$name]);
+		$this->observer_events[$name] = array_values($this->observer_events[$name]);
 
 		return;
 	}
@@ -178,12 +178,12 @@ class Events extends \Door\Core\Library{
 	 * @param   mixed    data 
 	 * @return  void
 	 */
-	public function run($name, & $data = NULL)
+	public function run_event($name, & $data = NULL)
 	{
 		// Event has been run
-		$this->has_run[$name] = TRUE;
+		$this->observer_has_run[$name] = TRUE;
 
-		if (empty($this->events[$name]))
+		if (empty($this->observer_events[$name]))
 			return;
 
 		$this->$data = & $data;
@@ -204,9 +204,9 @@ class Events extends \Door\Core\Library{
 	 * @param   string   name 
 	 * @return  boolean
 	 */
-	public function has_run($name)
+	public function event_has_run($name)
 	{
-		return isset($this->has_run[$name]);
+		return isset($this->observer_has_run[$name]);
 	}
 
 	/**
@@ -219,13 +219,13 @@ class Events extends \Door\Core\Library{
 	 */
 	protected function insert_event($name, $key, array $callback)
 	{
-		if (in_array($callback, $this->events[$name], TRUE))
+		if (in_array($callback, $this->observer_events[$name], TRUE))
 			return FALSE;
 
-		$this->events[$name] = array_merge(
-			array_slice($this->events[$name], 0, $key),
+		$this->observer_events[$name] = array_merge(
+			array_slice($this->observer_events[$name], 0, $key),
 			array($callback),
-			array_slice($this->events[$name], $key)
+			array_slice($this->observer_events[$name], $key)
 		);
 
 		return TRUE;

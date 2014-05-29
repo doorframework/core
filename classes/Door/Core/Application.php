@@ -18,6 +18,7 @@ use Exception;
  * @param \Door\Core\Library\HTML $html
  * @param \Door\Core\Library\Image $image
  * @param \Door\Core\Library\Layout $layout
+ * @param \Door\Core\Library\Language $lang
  * @param \Door\Core\Library\Media $media
  * @param \Door\Core\Library\Models $models
  * @param \Door\Core\Library\Router $router
@@ -25,7 +26,7 @@ use Exception;
  * @param \Door\Core\Library\URL $url
  * @param \Door\Core\Library\Views $views
  */
-class Application {
+class Application extends Observer {
 
 	// Release version
 	const VERSION  = '0.0.1';
@@ -64,6 +65,10 @@ class Application {
 	private $initialized = false;
 	
 	protected $docroot = null;
+	
+	protected $modpath = null;
+	
+	protected $vendorpath = null;
 
 	
 	/**
@@ -164,10 +169,21 @@ class Application {
 	
 	public function initialize()
 	{
+		//initialize modules
+		$modpath = $this->modpath();
+		foreach(glob($modpath."/*/init.php") as $filename)
+		{
+			self::init_module($this, $filename);
+		}		
+		
+		//initialize libraries
 		foreach($this->libraries as $library)
 		{
 			$library->init();
 		}
+		
+		$this->run_event('init', $this);
+		
 		$this->initialized = true;
 	}
 	
@@ -195,6 +211,52 @@ class Application {
 		return $this->docroot;
 	}
 	
+	
+	public function modpath($modpath = null)
+	{
+		if($modpath !== null)
+		{
+			if($this->initialized)
+			{
+				throw new Exception("application already initialized");
+			}
+			$this->modpath = $modpath;
+		}
+		
+		if($this->modpath === null)
+		{
+			throw new Exception("you must specify modpath of your application");
+		}
+		
+		return $this->modpath;
+	}	
+	
+	public function vendorpath($vendorpath = null)
+	{
+		if($vendorpath !== null)
+		{
+			if($this->initialized)
+			{
+				throw new Exception("application already initialized");
+			}
+			$this->vendorpath = $vendorpath;
+		}
+		
+		if($this->vendorpath === null)
+		{
+			throw new Exception("you must specify vendorpath of your application");
+		}
+		
+		return $this->vendorpath;
+	}	
+	
+		
+	
+	/**
+	 * Is it correct id
+	 * @param mixed $id
+	 * @return boolean true if id instance of MongoId or length of id is 24
+	 */
 	public function is_id($id)
 	{
 		return ($id instanceof \MongoId) || strlen($id) == 24;
@@ -207,6 +269,23 @@ class Application {
 	public function is_production()
 	{
 		return $this->environment == self::PRODUCTION;
+	}
+	
+	private static function init_module(Application $app, $filename)
+	{
+		require $filename;
+	}
+	
+	public function find_files($dir, $file, $ext)
+	{
+		$dir = str_replace("/", "", $dir);
+		$file = str_replace(".","", $file);
+		
+		$path = $dir."/".$file.".".$ext;
+		
+		$files = glob($this->modpath()."/*/".$path);
+		
+		return $files;
 	}
 	
 	

@@ -558,6 +558,8 @@ abstract class Model{
 			throw new Exception("Validation failed");
 		}
 		
+		$this->app()->models->run_event('beforupdate', $this);
+		
 		if(isset($this->_updated_column)){
 			$this->set($this->_updated_column, time());
 		}					
@@ -567,6 +569,8 @@ abstract class Model{
 			$this->_object,
 			array("upsert" => true)				
 		);		
+		
+		$this->app()->models->run_event('update', $this);
 	}
 	
 	public function create()
@@ -574,6 +578,8 @@ abstract class Model{
 		if( ! $this->check()){
 			throw new Exception("Validation failed");
 		}
+		
+		$this->app()->models->run_event('beforecreate', $this);
 		
 		if(isset($this->_created_column)){
 			$this->set($this->_created_column, time());
@@ -587,6 +593,8 @@ abstract class Model{
 		
 		
 		$this->get_collection()->insert($this->_object);		
+		
+		$this->app()->models->run_event('create', $this);
 		
 	}
 	
@@ -664,10 +672,18 @@ abstract class Model{
 	}	
 	
 	public function delete()
-	{
-		if(isset($this->_id)){			
-			$this->get_collection()->remove(array("_id" => $this->pk()));						
+	{	
+		if( ! $this->loaded())
+		{
+			throw new Exception("can`t delete not loaded model");
 		}
+				
+		$this->app()->models->run_event('beforedelete', $this);
+		
+		$this->get_collection()->remove(array("_id" => $this->pk()));						
+			
+		$this->app()->models->run_event('delete', $this);
+		
 		$this->reset();
 	}
 	
