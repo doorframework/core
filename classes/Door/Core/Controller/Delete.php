@@ -13,25 +13,14 @@ use Door\Core\Controller;
  */
 class Delete extends Controller {
 	
-	protected $model_name = null;
-	
-	protected $model_param = 'model';
+	protected $model = null;	
 	
 	protected $model_id_param = "id";
 	
+	protected $return_uri = "";
+	
 	public function execute()
 	{
-		$model_name = $this->param($this->model_param);
-		
-		if($model_name == null)
-		{
-			$model_name = $this->model_name;
-		}
-		
-		if($model_name == null)
-		{
-			throw new Exception('model name not specified');
-		}
 		
 		$model_id = $this->param($this->model_id_param);
 		
@@ -40,7 +29,7 @@ class Delete extends Controller {
 			throw new Exception('model id not specified');
 		}
 		
-		$model = $this->app->models->factory($model, $model_id);
+		$model = $this->app->models->factory($this->model, $model_id);
 		
 		if( ! $model->loaded())
 		{
@@ -48,6 +37,8 @@ class Delete extends Controller {
 		}
 		
 		$model->delete();
+		
+		$this->redirect($this->return_uri);
 	}
 	
 }

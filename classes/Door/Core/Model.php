@@ -1,13 +1,14 @@
 <?php
 
 namespace Door\Core;
-use \Door\Core\Database\Relation;
-use \Door\Core\Helper\Arr;
-use \MongoCollection;
-use \MongoDB;
-use \MongoDate;
-use \MongoId;
-use \Exception;
+use Door\Core\Database\Relation;
+use Door\Core\Helper\Arr;
+use Door\Core\Database\Type;
+use MongoCollection;
+use MongoDB;
+use MongoDate;
+use MongoId;
+use Exception;
 
 /**
  * Description of Model
@@ -140,27 +141,27 @@ abstract class Model{
 			$changed = ($value != $current_value);			
 			
 			switch(strtolower($this->_fields[$column]['type'])){
-				case "date":
+				case Type::DATE :
 					if( !is_object($value)){
 						$value = new MongoDate(intval($value));
 					}					
 					break;
-				case "integer":
+				case Type::INTEGER :
 					if($value !== null){
 						$value = intval($value);
 					}
 					break;
-				case "string":					
+				case Type::STRING :					
 					if($value !== null){
 						$value = (string)$value;
 					}
 					break;
-				case "array":
+				case Type::ARR :
 					if( !is_array($value)){
 						$value = null;
 					}
 					break;
-				case "boolean":
+				case Type::BOOLEAN :
 					if(strtolower($value) == 'on'){
 						$value = true;
 					} elseif(strtolower($value) == 'off'){
@@ -169,7 +170,7 @@ abstract class Model{
 						$value = (boolean)$value;
 					}
 					break;
-				case "mongoid":
+				case Type::MONGOID :
 					if(!is_object($value)){
 						$value = new MongoId($value);
 					}
@@ -185,20 +186,20 @@ abstract class Model{
 			
 			$relation = $this->_relations[$column];
 			switch($relation['type']){
-				case \Door\Core\Database\Relation::MANY_TO_ONE:
+				case Relation::MANY_TO_ONE:
 					if( !($value instanceof Model)){
 						throw new Exception("can`t set this argument");
 					}					
 					$this->{$relation['field']} = $value->pk();									
 					break;
-				case \Door\Core\Database\Relation::MANY_TO_MANY:
+				case Relation::MANY_TO_MANY:
 					if( ! is_array($value))
 					{
 						$value = explode(",", trim($value," ,"));
 					}
 					$this->$column->from_array($value);										
 					break;
-				case \Door\Core\Database\Relation::ONE_TO_MANY:
+				case Relation::ONE_TO_MANY:
 				
 				default:
 					throw new Exception('can`t set relation :relation', array($relation['type']));

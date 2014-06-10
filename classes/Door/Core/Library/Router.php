@@ -82,7 +82,7 @@ class Router extends \Door\Core\Library {
 		
 		$route = new Route($uri, $controller, $regex);
 		
-		$route->controller_config($controller_config);
+		$route->add_config($controller_config);
 		
 		$this->routes[$name] = $route;
 		

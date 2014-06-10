@@ -70,6 +70,13 @@ class Bootstrap {
 		
 		register_shutdown_function(array($app->session, 'write'));
 		
+		$app->router->register_controller("core/upload_image", "/Door/Core/Controller/Image/UploadOne");
+		$app->router->register_controller("core/upload_images", "/Door/Core/Controller/Image/UploadMultiple");
+		$app->router->register_controller("core/view_images", "/Door/Core/Controller/Image/View");
+		$app->router->register_controller("core/delete", "/Door/Core/Controller/Delete");
+		$app->router->register_controller("core/media", "/Door/Core/Controller/Media");
+		$app->router->register_controller("core/redirect", "/Door/Core/Controller/Redirect");
+		
 		
 	}
 	

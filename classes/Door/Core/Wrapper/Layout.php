@@ -15,11 +15,15 @@ use Door\Core\Wrapper;
  */
 class Layout extends Wrapper{
 	
-	protected $layout_data_param;
+	protected $layout_key = 'layout';
+	
+	protected $layout_filename = 'core/layout';
 	
 	
 	public function before() {
+		
 		parent::before();
+		
 	}
 	
 	public function after()

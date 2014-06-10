@@ -192,64 +192,47 @@ class Application extends Observer {
 		return $this->charset;
 	}	
 	
+	/**
+	 * Get or set path to public folder
+	 * Set ex.: $app->docroot(__DIR__."/public");
+	 * Get ex.: $docroot = $app->docroot();
+	 * @param string $docroot
+	 * @return string
+	 */
 	public function docroot($docroot = null)
 	{
-		if($docroot !== null)
-		{
-			if($this->initialized)
-			{
-				throw new Exception("application already initialized");
-			}
-			$this->docroot = $docroot;
-		}
-		
-		if($this->docroot === null)
-		{
-			throw new Exception("you must specify docroot of your application");
-		}
-		
-		return $this->docroot;
+		return $this->get_path('docroot', $docroot);
 	}
 	
+	private function get_path($name, $path = null)
+	{
+		if($path !== null)
+		{
+			$this->$name = $path;
+			return;
+		}		
+		if($this->$name === null)
+		{
+			throw new Exception("you must specify $name in your application");
+		}
+		return $this->$name;
+		
+	}
+	
+	public function apppath($apppath = null)
+	{
+		return $this->get_path('apppath', $apppath);
+	}	
 	
 	public function modpath($modpath = null)
 	{
-		if($modpath !== null)
-		{
-			if($this->initialized)
-			{
-				throw new Exception("application already initialized");
-			}
-			$this->modpath = $modpath;
-		}
-		
-		if($this->modpath === null)
-		{
-			throw new Exception("you must specify modpath of your application");
-		}
-		
-		return $this->modpath;
+		return $this->get_path('modpath', $modpath);
 	}	
 	
 	public function vendorpath($vendorpath = null)
 	{
-		if($vendorpath !== null)
-		{
-			if($this->initialized)
-			{
-				throw new Exception("application already initialized");
-			}
-			$this->vendorpath = $vendorpath;
-		}
-		
-		if($this->vendorpath === null)
-		{
-			throw new Exception("you must specify vendorpath of your application");
-		}
-		
-		return $this->vendorpath;
+		return $this->get_path('vendor', $vendorpath);
 	}	
-	
 		
 	
 	/**
@@ -276,14 +259,28 @@ class Application extends Observer {
 		require $filename;
 	}
 	
+	/**
+	 * Find files in modules
+	 * @param type $dir
+	 * @param type $file
+	 * @param type $ext
+	 * @return type
+	 */
 	public function find_files($dir, $file, $ext)
 	{
 		$dir = str_replace("/", "", $dir);
 		$file = str_replace(".","", $file);
 		
-		$path = $dir."/".$file.".".$ext;
+		$path = $dir."/".$file.".".$ext;				
 		
 		$files = glob($this->modpath()."/*/".$path);
+		
+		$app_filename = $this->apppath()."/".$path;
+		
+		if(file_exists($app_filename))
+		{
+			array_unshift($files, $app_filename);
+		}		
 		
 		return $files;
 	}

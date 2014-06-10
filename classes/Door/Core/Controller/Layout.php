@@ -376,4 +376,12 @@ abstract class Layout extends Controller{
 		}
 	}
 	
+	/**
+	 * @return View
+	 */
+	public function get_layout()
+	{
+		return $this->layout;
+	}
+	
 }
