@@ -5,7 +5,7 @@
  * box@serginho.ru
  */
 
-namespace App\Controller\Admin\Image;
+namespace Door\Core\Controller\Image;
 
 /**
  * Controller for rendering images
@@ -41,9 +41,9 @@ class View extends \Door\Core\Controller {
 	
 	protected $item_view = null;
 	
-	protected $list_image = "default";
+	protected $list_image = "bspanel_list";
 	
-	protected $item_image = 'default';
+	protected $item_image = 'bspanel_image';
 	
 	public function execute() 
 	{		

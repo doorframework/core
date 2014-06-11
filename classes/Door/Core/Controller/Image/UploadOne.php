@@ -15,17 +15,18 @@ use Door\Core\Controller;
  */
 class UploadOne extends Controller {
 
+	protected $field = 'image';
 
 	public function execute()
 	{
-		
-		if(count($_FILES) > 0)
+		if(isset($_FILES[$this->field]))
 		{
-			foreach($_FILES as $file)
+			$file_ids = array();
+			
+			foreach($_FILES[$this->field]['tmp_name'] as $filename)
 			{
-				$filename = $file['tmp_name'];
 				$image_model = $this->app->image->from_file($filename);
-								
+				
 				if(isset($_GET['CKEditorFuncNum']))
 				{
 					$url = $this->app->image->url($image_model->pk());
@@ -43,8 +44,8 @@ class UploadOne extends Controller {
 					$this->response->body($image_model->pk());
 				}
 				break;
-			}
-		}
+			}			
+		}				
 	}
 		
 	

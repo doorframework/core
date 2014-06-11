@@ -77,7 +77,7 @@ class Bootstrap {
 		$app->router->register_controller("core/media", "/Door/Core/Controller/Media");
 		$app->router->register_controller("core/redirect", "/Door/Core/Controller/Redirect");
 		
-		
+		$app->router->add("media","/media/<path>","/Door/Core/Controller/Media", array('path' => '.*'));
 	}
 	
 	

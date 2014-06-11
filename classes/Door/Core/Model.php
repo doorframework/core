@@ -188,7 +188,13 @@ abstract class Model{
 			switch($relation['type']){
 				case Relation::MANY_TO_ONE:
 					if( !($value instanceof Model)){
-						throw new Exception("can`t set this argument");
+						
+						$value = $this->app()->models->factory($relation['model'], $value);
+						
+						if( ! $value->loaded())
+						{
+							throw new Exception("can`t set this argument");
+						}											
 					}					
 					$this->{$relation['field']} = $value->pk();									
 					break;

@@ -14,7 +14,7 @@ use \Exception;
  */
 class Views extends \Door\Core\Library {
 	
-	protected $paths = array();
+	/*protected $paths = array();
 	
 	public function add($prefix, $path, $priority = 0)
 	{		
@@ -70,7 +70,7 @@ class Views extends \Door\Core\Library {
 		}
 		
 		return $view_path;
-	}
+	}*/
 	
 	/**
 	 * @param string $name
@@ -78,12 +78,15 @@ class Views extends \Door\Core\Library {
 	 */
 	public function get($name, $data = null)
 	{
-		$path = $this->get_path($name);
-		if($path === null)
+		$files = $this->app->find_files("views", $name, "php");		
+		
+		if( ! is_array($files) || count($files) == 0)
 		{
 			$name = htmlspecialchars($name);
 			throw new Exception("View {$name} not found");
 		}
+		
+		$path = $files[0];
 		
 		if($data === null)
 		{

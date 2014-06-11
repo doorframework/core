@@ -124,32 +124,31 @@ class Language extends \Door\Core\Library {
 			
 			$t = array();
 			
-			foreach($this->paths as $path)
+			$files = $this->app->find_files("lang", $lang_path, "php");
+
+			foreach($files as $file)
 			{
-				$filename = $path."/".$lang_path.".php";
-				
-				if(file_exists($filename))
-				{
-					$t = array_merge($t, self::load($filename));
-				}
+				$t = array_merge($t, self::load_file($file));								
 			}
+			
+			$table += $t;
 			
 			// Append the sub table, preventing less specific language
 			// files from overloading more specific files
-			$table += $t;
+			
 
 			// Remove the last part
 			array_pop($parts);
 		}
 		while ($parts);
-
+		
 		// Cache the translation table locally
 		return $this->_cache[$lang] = $table;
 	}
 	
 	protected static function load_file($file)
-	{
-		return include $file;
+	{		
+		return require $file;
 	}
 
 }

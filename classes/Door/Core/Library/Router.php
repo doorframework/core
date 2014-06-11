@@ -74,11 +74,13 @@ class Router extends \Door\Core\Library {
 		
 		$controller_config = array();
 		
-		if(isset($this->contoller_aliases[$controller]))
+		if(isset($this->controller_aliases[$controller]))
 		{
 			$controller_config = $this->controller_configs[$controller];
-			$controller = $this->contoller_aliases[$controller];			
-		}
+			$controller = $this->controller_aliases[$controller];			
+		}	
+		
+		$controller = str_replace("/", "\\", $controller);
 		
 		$route = new Route($uri, $controller, $regex);
 		
@@ -183,6 +185,8 @@ class Router extends \Door\Core\Library {
 			$config += $this->controller_configs[$controller];
 			$controller = $this->controller_aliases[$controller];			
 		}
+		
+		$controller = str_replace("/", "\\", $controller);
 		
 		$this->controller_aliases[$alias] = $controller;
 		
