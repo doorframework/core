@@ -67,6 +67,8 @@ class Language extends \Door\Core\Library {
 	 */
 	public function get($string, $lang = NULL)
 	{
+		$string = strtolower($string);
+		
 		if ( ! $lang)
 		{
 			// Use the global target language
@@ -79,6 +81,15 @@ class Language extends \Door\Core\Library {
 		// Return the translated string if it exists
 		return isset($table[$string]) ? $table[$string] : $string;
 	}
+	
+	public function get_ucf($string, $lang = null)
+	{
+		return $this->mb_ucfirst($this->get($string, $lang));
+	}
+
+    private function mb_ucfirst($str, $enc = 'utf-8') { 
+    		return mb_strtoupper(mb_substr($str, 0, 1, $enc), $enc).mb_substr($str, 1, mb_strlen($str, $enc), $enc); 
+    }	
 	
 	/**
 	 * Add directory with translations

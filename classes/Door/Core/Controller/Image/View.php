@@ -41,9 +41,9 @@ class View extends \Door\Core\Controller {
 	
 	protected $item_view = null;
 	
-	protected $list_image = "bspanel_list";
+	protected $list_image = "default";
 	
-	protected $item_image = 'bspanel_image';
+	protected $item_image = 'default';
 	
 	public function execute() 
 	{		

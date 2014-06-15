@@ -234,7 +234,7 @@ class Form {
 		// Add default rows and cols attributes (required)
 		$attributes += array('rows' => 10, 'cols' => 50);
 
-		return '<textarea'.self::attributes($attributes).'>'.HTML::chars($body, $double_encode).'</textarea>';
+		return '<textarea'.self::attributes($attributes).'>'.self::chars($body, $double_encode).'</textarea>';
 	}
 
 	/**

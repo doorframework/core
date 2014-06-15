@@ -17,7 +17,7 @@ class Delete extends Controller {
 	
 	protected $model_id_param = "id";
 	
-	protected $return_uri = "";
+	protected $return_uri = null;
 	
 	public function execute()
 	{
@@ -38,7 +38,14 @@ class Delete extends Controller {
 		
 		$model->delete();
 		
-		$this->redirect($this->return_uri);
+		if($this->return_uri !== null){
+			$this->redirect($this->return_uri);
+		} elseif(isset($_SERVER['HTTP_REFERER'])) {
+			$this->redirect($_SERVER['HTTP_REFERER']);
+		} else {
+			$this->redirect("");
+		}
+		
 	}
 	
 }

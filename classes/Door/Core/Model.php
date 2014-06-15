@@ -113,7 +113,7 @@ abstract class Model{
 					$this->where($key,'=',$value);
 				}
 				$this->find();
-			} else {
+			} elseif($this->app()->is_id($id)) {
 				$this->find($id);
 			}
 			
@@ -191,12 +191,12 @@ abstract class Model{
 						
 						$value = $this->app()->models->factory($relation['model'], $value);
 						
-						if( ! $value->loaded())
+						if( $value->loaded())
 						{
-							throw new Exception("can`t set this argument");
+							$this->{$relation['field']} = $value->pk();
 						}											
 					}					
-					$this->{$relation['field']} = $value->pk();									
+					
 					break;
 				case Relation::MANY_TO_MANY:
 					if( ! is_array($value))
