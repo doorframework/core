@@ -13,7 +13,7 @@
     "require": {
         "php" : ">5.4",
 		"doorframework/installer" : "1.0.0",
-		"imagine/imagine": "0.6.*@dev",
+		"imagine/imagine": "v0.6.1",
 		"jbroadway/urlify" : "1.0.*"
     },
     "autoload": {
