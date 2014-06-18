@@ -19,7 +19,7 @@ class Media extends \Door\Core\Controller{
 		
 		$path = $this->param('path');
 		
-		$file_path = $this->app->media->get_path($path);
+		$file_path = $this->app->media->get_path($path);	
 		
 		if($file_path == null)
 		{

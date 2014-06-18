@@ -298,7 +298,7 @@ class Media extends \Door\Core\Library {
 		if($file_path == null)
 		{
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
-			$path = substr($file, 0, strlen($file) - strlen($extension) - 1);
+			$path = substr($file, 0, strlen($file) - strlen($extension) - 1);										
 			$files = $this->app->find_files('media', $path, $extension);
 			if(is_array($files) && count($files) > 0)
 			{

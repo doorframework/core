@@ -1,7 +1,12 @@
 <?php
 
-/* 
- * Created by Sachik Sergey
- * box@serginho.ru
- */
+namespace Door\Core\Image;
 
+class Conversion {
+	
+	public function __construct() {
+		
+	}
+	
+	
+}

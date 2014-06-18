@@ -269,7 +269,7 @@ class Application extends Observer {
 	public function find_files($dir, $file, $ext)
 	{
 		$dir = str_replace("/", "", $dir);
-		$file = str_replace(".","", $file);
+		$file = str_replace(array("..","./"), "", $file);
 		
 		$path = $dir."/".$file.".".$ext;				
 		

@@ -12,31 +12,17 @@ abstract class Converter {
 	 * Картинка
 	 * @var Image
 	 */
-	protected $image;
-
-	public function __construct(Image $image, array $config) {
-		
-		foreach($config as $key => $value)
-		{
-			if(property_exists($this, $key))
-			{
-				$this->$key = $value;
-			}
-		}
-		$this->image = $image;
-		
-	}
+	protected $image;		
 	
-	/**
-	 * 
-	 * @return Image
-	 */
-	public function get_image()
+	final public function convert(Image $image)
 	{
-		return $this->image;
-	}	
-	
-	public abstract function convert();
-
+		$this->image = $image;
+		$this->go();		
+		$image = $this->image;
+		unset($this->image);		
+		return $image;
+	}
+		
+	protected abstract function go();
 
 }
