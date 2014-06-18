@@ -1,6 +1,7 @@
 <?php
 
 namespace Door\Core\Helper;
+use URLify;
 
 /**
  * Text helper class. Provides simple methods for working with text.
@@ -52,9 +53,7 @@ class Text {
 	
 	public static function alias($text)
 	{
-		$text = preg_replace('/[^A-Za-z0-9_\-\.\pL]/u', '_', $text);
-		$text = preg_replace('/[_]+/', '_', $text);	
-		return trim($text, "_");
+		return URLify::filter ($text);
 	}
 
 	/**
