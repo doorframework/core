@@ -68,8 +68,18 @@ abstract class Model{
 	{
 		if(! isset($this->_fields['_id'])){
 			$this->_fields['_id'] = array(
-				'type' => 'MongoId'
+				'type' => Database\Type::MONGOID
 			);
+		}
+		
+		foreach($this->_fields as $key => $value) 
+		{
+			if(is_string($value))
+			{
+				$this->_fields[$key] = array(
+					'type' => $value
+				);
+			}
 		}
 	}
 	
