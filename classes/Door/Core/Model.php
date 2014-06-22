@@ -71,16 +71,6 @@ abstract class Model{
 				'type' => Database\Type::MONGOID
 			);
 		}
-		
-		foreach($this->_fields as $key => $value) 
-		{
-			if(is_string($value))
-			{
-				$this->_fields[$key] = array(
-					'type' => $value
-				);
-			}
-		}
 	}
 	
 	/**
@@ -101,6 +91,16 @@ abstract class Model{
 		if( ! array_key_exists($this->_model_name, self::$_init_cache))
 		{
 			$this->initialize();
+			
+			foreach($this->_fields as $key => $value) 
+			{
+				if(is_string($value))
+				{
+					$this->_fields[$key] = array(
+						'type' => $value
+					);
+				}
+			}			
 			
 			self::$_init_cache[$this->_model_name] = array(
 				"_fields" => $this->_fields,
