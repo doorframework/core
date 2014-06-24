@@ -128,6 +128,24 @@ abstract class Model{
 			}
 			
 		}
+		else
+		{
+			foreach($this->_fields as $name => $field)
+			{
+				$default = Arr::get($field, 'default');
+				if($default !== null)
+				{
+					if($field['type'] == 'date' && $default = 'NOW')
+					{
+						$this->$name = time();
+					}
+					else
+					{
+						$this->$name = $default;
+					}
+				}
+			}
+		}
 		
 		$this->after_construct();
 	}
@@ -153,6 +171,9 @@ abstract class Model{
 			switch(strtolower($this->_fields[$column]['type'])){
 				case Type::DATE :
 					if( !is_object($value)){
+						if(preg_match("/[0-9]{2}\\.[0-9]{2}.[0-9]{4}/", $value)){
+							$value = strtotime($value);
+						}						
 						$value = new MongoDate(intval($value));
 					}					
 					break;
@@ -459,6 +480,9 @@ abstract class Model{
 				break;
 			case "in": 
 				$this->_criteria[$key]['$in'] = $value;
+				break;				
+			case "!=": 
+				$this->_criteria[$key]['$ne'] = $value;
 				break;				
 		
 		}
@@ -768,6 +792,21 @@ abstract class Model{
 	public function app()
 	{
 		return $this->_app;
+	}
+	
+	/**
+	 * Get name of model
+	 * @return type
+	 */
+	public function name()
+	{
+		if(isset($this->name)){
+			return $this->name;
+		} elseif(isset($this->title)){
+			return $this->title;
+		} else {
+			return $this->get_model_name()."#".$this->pk();
+		}
 	}
 	
 	

@@ -16,7 +16,7 @@ class URL extends \Door\Core\Library {
 
 	protected $hostname = null;
 	
-	protected $base_url = "";
+	protected $base_url = "/";
 	
 	
 	public function hostname($hostname = null)

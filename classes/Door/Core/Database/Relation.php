@@ -275,9 +275,9 @@ class Relation {
 	 * @return Model
 	 */
 	public function get_model()
-	{
-		$model_name = $this->relation2['model'];
-		$model = new $model_name;
+	{		
+		$model_name = $this->relation1['model'];
+		$model = $this->model1->app()->models->factory($model_name);
 		$model->where('_id', 'in', $this->get_ids());
 		return $model;
 	}
