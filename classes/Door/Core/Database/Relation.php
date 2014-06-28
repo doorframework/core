@@ -95,7 +95,6 @@ class Relation {
 						
 		if(Arr::get($this->relation1, 'store') !== false){
 
-
 			if(isset($this->relation1['field'])){
 
 				$field = $this->relation1['field'];
@@ -133,6 +132,7 @@ class Relation {
 				&& $this->is_recursive_call() == false)
 		{
 			$model->{$this->field2}->add($this->model1);
+			$model->save();
 		}
 		
 	
@@ -500,8 +500,8 @@ class Relation {
 		if(count($trace) == 3)
 		{
 			$return_value = 
-					$trace[0]['file'] == $trace[1]['file']
-					&& $trace[0]['function'] == $trace[1]['function'];
+					$trace[1]['file'] == $trace[2]['file']
+					&& $trace[1]['function'] == $trace[2]['function'];
 		}
 				
 		return $return_value;

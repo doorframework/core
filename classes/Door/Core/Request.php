@@ -111,18 +111,19 @@ class Request {
 				}	
 			}		
 			
-			if($this->has_stopped())
+			if($this->has_stopped() && strlen($this->response->content_length()) == 0)
 			{
-				if(strlen($this->response->content_length()) == 0)
-				{
-					$this->response->body('error occured');
-				}
+				$this->response->body('error occured');
 			}								
 		}
 		else
 		{			
 			$this->response->status(404);
-			$this->response->body("resource not found");
+		}
+		
+		if(intval($this->response->status()) == 404)
+		{
+			$this->response->body("Not found.");
 		}
 		
 		return $this;

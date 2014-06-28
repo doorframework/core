@@ -69,6 +69,8 @@ class Application extends Observer {
 	protected $modpath = null;
 	
 	protected $vendorpath = null;
+	
+	protected $configurators = array();
 
 	
 	/**
@@ -164,7 +166,42 @@ class Application extends Observer {
 			$this->initialize();
 		}
 		
-		return new Request(trim($uri, "/"), $this);
+		$uri = trim($uri, "/");		
+		$this->init_configurators($uri);
+		
+		return new Request($uri, $this);
+	}
+	
+	private function init_configurators($uri)
+	{		
+		foreach($this->configurators as $index => $configurator_config)
+		{
+			if($configurator_config['executed'])
+			{
+				continue;
+			}
+			
+			if(strpos($uri, $configurator_config['prefix']) !== 0)
+			{
+				continue;
+			}
+			
+			$configurator = $configurator_config['configurator'];
+			if(is_callable($configurator))
+			{
+				call_user_func($configurator, $this);
+			}
+			elseif(file_exists($configurator))
+			{
+				self::init_module($this, $configurator);
+			}
+			else
+			{
+				throw new Exception('bad configurator');
+			}
+			
+			$this->configurators[$index]['executed'] = true;
+		}				
 	}
 	
 	public function initialize()
@@ -283,6 +320,15 @@ class Application extends Observer {
 		}		
 		
 		return $files;
+	}
+	
+	public function add_configurator($prefix, $configurator)
+	{
+		$this->configurators[] = array(
+			'executed' => false,
+			'prefix' => $prefix,
+			'configurator' => $configurator
+		);
 	}
 	
 	
