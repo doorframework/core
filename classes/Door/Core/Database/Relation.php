@@ -286,8 +286,11 @@ class Relation {
 	 * @return array
 	 * @throws Kohana_Exception
 	 */
-	public function get_ids()
+	public function get_ids($as_string = false)
 	{
+		$return_value = array();
+		
+		
 		if(Arr::get($this->relation1, 'store') !== false){
 			
 			if(isset($this->relation1['field'])){
@@ -297,7 +300,6 @@ class Relation {
 				if( ! is_array($return_value)){
 					$return_value = array();
 				}				
-				return $return_value;
 				
 			} else {
 				
@@ -316,7 +318,7 @@ class Relation {
 					$ids = array();
 				}
 				
-				return $ids;							
+				$return_value = $ids;							
 				
 			}
 			
@@ -339,7 +341,7 @@ class Relation {
 					}
 				}
 
-				return $ids;
+				$return_value =  $ids;
 				
 			} else {
 				
@@ -361,18 +363,28 @@ class Relation {
 					}
 				}
 
-				return $ids;						
+				$return_value = $ids;						
 				
 			}												
 		} else {
 			
 			throw new Kohana_Exception("can`t get ids for this relation");
 		}
+		
+		if($as_string)
+		{
+			for($i = 0; $i < count($return_value); $i++)
+			{
+				$return_value[$i] = (string)$return_value[$i];
+			}
+		}
+		
+		return $return_value;
 	}
 	
 	public function from_array(array $ids)
 	{		
-		$old_ids = $this->get_ids();
+		$old_ids = $this->get_ids(true);
 		$remove_ids = array_diff($old_ids, $ids);
 		$add_ids = array_diff($ids, $old_ids);
 		
