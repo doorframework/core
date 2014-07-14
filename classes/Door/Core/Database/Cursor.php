@@ -54,6 +54,7 @@ class Cursor extends \MongoCursor {
 	 */
 	protected function load_model($data)
 	{
+		if($data == null) return null;
 		$model = $this->model->app()->models->factory($this->model_name);
 		$model->from_array($data);
 		return $model;

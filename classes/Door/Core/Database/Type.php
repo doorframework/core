@@ -20,5 +20,6 @@ class Type {
 	const ARR = 'array';
 	const BOOLEAN = 'boolean';
 	const MONGOID = 'mongoid';
+	const DOUBLE = 'double';
 	
 }

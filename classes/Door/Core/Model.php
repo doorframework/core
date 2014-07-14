@@ -206,6 +206,9 @@ abstract class Model{
 						$value = new MongoId($value);
 					}
 					break;
+				case Type::DOUBLE :
+					$value = floatval($value);
+					break;
 			}		
 			
 			if($changed){
@@ -314,7 +317,11 @@ abstract class Model{
 						}			
 						break;
 				}
-			}				
+			}	
+			elseif(array_key_exists('default',$this->_fields[$column]))
+			{
+				$return_value = $this->_fields[$column]['default'];
+			}
 			
 			//if field was not set, return null
 			return $return_value;
