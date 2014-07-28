@@ -209,6 +209,7 @@ class Auth extends \Door\Core\Library {
 				$user = $this->app->models->factory('User', $user_id);
 				if( ! $user->loaded())
 				{
+					$this->logout();
 					throw new Exception("Authorized user not found");
 				}				
 				$this->user = $user;

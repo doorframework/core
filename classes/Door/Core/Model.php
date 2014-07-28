@@ -441,9 +441,19 @@ abstract class Model{
 		}				
 	}
 	
-	public function pk()
+	/**
+	 * @param boolean $as_string
+	 * @return null
+	 * @return MongoId
+	 * @return string
+	 */
+	public function pk($as_string = false)
 	{
-		return Arr::get($this->_object, '_id');
+		$id = Arr::get($this->_object, '_id');
+		
+		if($id === null) return null;		
+		
+		return $as_string ? (string)$id : $id;
 	}
 	
 	/**
@@ -603,7 +613,7 @@ abstract class Model{
 	{
 		if( ! $this->check())
 		{
-			throw new Exception("Validation failed");
+			throw new Exception("Validation failed. " . implode(", ", $this->validation()->translated_errors($this->app()->lang)));
 		}
 		
 		$this->app()->models->run_event('beforupdate', $this);
@@ -624,7 +634,7 @@ abstract class Model{
 	public function create()
 	{
 		if( ! $this->check()){
-			throw new Exception("Validation failed");
+			throw new Exception("Validation failed. " . implode(", ", $this->validation()->translated_errors($this->app()->lang)));
 		}
 		
 		$this->app()->models->run_event('beforecreate', $this);

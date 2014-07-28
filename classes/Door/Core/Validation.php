@@ -2,6 +2,7 @@
 
 namespace Door\Core;
 use Door\Core\Helper\Arr;
+use Door\Core\Library\Language;
 use ReflectionFunction;
 use ReflectionMethod;
 
@@ -472,9 +473,43 @@ class Validation implements \ArrayAccess {
 	 * @param   mixed   $translate  translate the message
 	 * @return  array
 	 */
-	public function errors($file = NULL, $translate = TRUE)
+	public function errors()
 	{
 		return $this->_errors;	
+	}
+	
+	public function translated_errors(Language $lang)
+	{
+		$return_value = array();
+		
+		foreach($this->_errors as $field => $data)
+		{
+			$translated_field = $lang->get($field);
+			$error = $data[0];
+			$translated_error = $lang->get("validation.".$error);			
+			switch($error)
+			{
+				case "matches":
+					$field1 = $lang->get($data[1][1]);
+					$field2 = $lang->get($data[1][2]);
+					$translated_error = str_replace(array("{field1}","{field2}"), array($field1, $field2), $translated_error);
+					$return_value[$field] = $translated_error;					
+					break;
+				default:					
+					if($translated_error != $error)
+					{
+						$translated_error = str_replace("{field}", $translated_field, $translated_error);
+					}
+					else
+					{
+						$translated_error = $translated_field. ": ". $error;
+					}
+					$return_value[$field] = $translated_error;					
+			}
+			
+
+		}
+		return $return_value;
 	}
 
 }

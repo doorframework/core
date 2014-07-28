@@ -13,6 +13,17 @@ use \Exception;
  * Description of User
  *
  * @author serginho
+ * @param $name
+ * @param $username
+ * @param $password
+ * @param $email
+ * @param $created
+ * @param $updated
+ * @param $last_login
+ * @param $logins
+ * @param $roles_ids
+ * @param \Door\Core\Database\Relation $roles
+ * @param \Door\Core\Database\Relation $tokens
  */
 class User extends \Door\Core\Model{
 	
@@ -64,7 +75,7 @@ class User extends \Door\Core\Model{
 			),
 		);		
 		
-		$this->_rules += array(
+		/*$this->_rules += array(
 			'username' => array(
 				array('not_empty'),
 				array('max_length', array(':value', 32)),
@@ -75,7 +86,7 @@ class User extends \Door\Core\Model{
 				array('email'),
 				array(array(':model', 'unique'), array('email', ':value')),
 			),
-		);		
+		);*/		
 	}
 	
 	protected $_created_column = 'created';
@@ -130,7 +141,6 @@ class User extends \Door\Core\Model{
 
 			// Set the last login date
 			$this->last_login = time();
-
 			// Save the user
 			$this->save();
 		}
