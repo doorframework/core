@@ -106,7 +106,7 @@ abstract class Model{
 				"_fields" => $this->_fields,
 				"_relations" => $this->_relations,
 				"_rules" => $this->_rules
-			);
+			);						
 		}
 		else
 		{
@@ -114,6 +114,8 @@ abstract class Model{
 			{
 				$this->$key = $value;
 			}
+			
+			unset($value);
 		}
 		
 		if($id !== null){
@@ -711,7 +713,7 @@ abstract class Model{
 		$this->_validation = Validation::factory($this->_object)
 			->bind(':model', $this)
 			->bind(':changed', $this->_changed);
-
+		
 		foreach ($this->rules() as $field => $rules)
 		{
 			$this->_validation->rules($field, $rules);
