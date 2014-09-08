@@ -430,9 +430,9 @@ abstract class Model{
 		
 		foreach($expected as $key)
 		{
-			if(isset($this->_fields[$key]) || isset($this->_relations[$key]))
+			if(array_key_exists($key, $values) && (isset($this->_fields[$key]) || isset($this->_relations[$key])))
 			{
-				$this->$key = $value;
+				$this->$key = $values[$key];
 			}
 		}
 		
