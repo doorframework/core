@@ -418,7 +418,7 @@ abstract class Model{
 		// Default to expecting everything except the primary key
 		if ($expected === NULL)
 		{
-			$expected = array_keys($this->_fields);
+			$expected = array_merge(array_keys($this->_fields), array_keys($this->_relations));
 
 			// Don't set the primary key by default
 			unset($values["_id"]);
@@ -428,7 +428,7 @@ abstract class Model{
 			$this->_object = array();			
 		}
 		
-		foreach($values as $key => $value)
+		foreach($expected as $key)
 		{
 			if(isset($this->_fields[$key]) || isset($this->_relations[$key]))
 			{
