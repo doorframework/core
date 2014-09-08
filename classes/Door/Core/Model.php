@@ -828,6 +828,11 @@ abstract class Model{
 		}
 	}
 	
+	public function relations()
+	{
+		return $this->_relations;
+	}
+	
 	
 	
 }

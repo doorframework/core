@@ -70,7 +70,20 @@ abstract class Controller {
 		return $this->app->views->get($name, $data);
 	}
 	
-	public abstract function execute();	
+	public function execute()
+	{
+		$action = $this->param('action','index');	
+		
+		$method = "action_".$action;
+		if(method_exists($this, $method))
+		{
+			$this->$method();
+		}
+		elseif($this->response->content_length() == 0)
+		{
+			$this->response->status(404);
+		}
+	}
 	
 	protected function redirect($uri)
 	{

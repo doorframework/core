@@ -89,7 +89,8 @@ class Relation {
 			
 		}
 		
-		if( ! $model->loaded()){
+		if( ! $model->loaded()){					
+			
 			throw new Exception("model not loaded");
 		}		
 						
